@@ -14,10 +14,10 @@ class Recipe(db.Model):
         db.DateTime, default=None, onupdate=datetime.utcnow
     )
     created_by = db.Column(db.Integer, 
-                           db.ForeignKey("User.id"),
+                           db.ForeignKey("user.id"),
                            nullable=False,
     )
-    modified_by = db.Column(db.Integer, db.ForeignKey("User.id"))
+    modified_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 
 class User(db.Model):
