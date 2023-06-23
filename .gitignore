@@ -3,3 +3,4 @@ schema.md
 venv
 __pycache__
 recipe.db
+seed_data/
