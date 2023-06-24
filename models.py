@@ -19,6 +19,9 @@ class Recipe(db.Model):
     )
     modified_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    def __repr__(self):
+        return '<Recipe %r>' % self.name
+
 
 class User(db.Model):
     __tablename__ = "user"
@@ -26,6 +29,9 @@ class User(db.Model):
     user_name = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     role = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.user_name
 
 class Tag(db.Model):
     __tablename__ = "tag"
