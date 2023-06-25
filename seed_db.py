@@ -3,45 +3,45 @@ from datetime import datetime
 from pathlib import Path
 
 from config import app, db
-from models import User, Recipe
+from models import User, Recipe, Tag
 
 import csv
 
 # %%
-data_user = [
-    User(
-        id = 1,
-        user_name = 'brynna',
-        password = 'patel123',
-        role = 'cook',
-    ),
-    User(
-        id = 2,
-        user_name = 'kishan',
-        password = 'patel123',
-        role = 'cook',
-    ),
-]
+# data_user = [
+#     User(
+#         id = 1,
+#         user_name = 'brynna',
+#         password = 'patel123',
+#         role = 'cook',
+#     ),
+#     User(
+#         id = 2,
+#         user_name = 'kishan',
+#         password = 'patel123',
+#         role = 'cook',
+#     ),
+# ]
 
-data_recipe = [
-    Recipe(
-        id = 1,
-        name = 'Chicken Biryani',
-        date_created = datetime(2023,6,22,17,2,31),
-        date_modified = datetime(2023,6,22,17,2,31),
-        created_by = 1,
-        modified_by = 1,
-    ),
-]
+# data_recipe = [
+#     Recipe(
+#         id = 1,
+#         name = 'Chicken Biryani',
+#         date_created = datetime(2023,6,22,17,2,31),
+#         date_modified = datetime(2023,6,22,17,2,31),
+#         created_by = 1,
+#         modified_by = 1,
+#     ),
+# ]
 
 # %%
-with app.app_context():
-    for u in data_user:
-        db.session.add(u)
-    for r in data_recipe:
-        db.session.add(r)
+# with app.app_context():
+#     for u in data_user:
+#         db.session.add(u)
+#     for r in data_recipe:
+#         db.session.add(r)
 
-    db.session.commit()
+#     db.session.commit()
     
     
     # db.drop_all()
@@ -61,12 +61,12 @@ with app.app_context():
     # db.session.commit()
 
 # %%
-csv_users = []
-with open("./seed_data/data_user.csv", 'r') as f:
+# csv_users = []
+# with open("./seed_data/data_user.csv", 'r') as f:
 
-    cols = f.readline().replace('\n', '').split(',')
-    for line in f:
-        values = line.replace(',')
+#     cols = f.readline().replace('\n', '').split(',')
+#     for line in f:
+#         values = line.replace(',')
 
 # %%
 seed_map = [
@@ -82,6 +82,13 @@ seed_map = [
         'file': 'data_recipe.csv',
         'dt_cols': ['date_created', 'date_modified'],
     },
+    {
+        'name': 'tag',
+        'cls': Tag,
+        'file': 'data_tag.csv',
+        'dt_cols': [],
+
+    }
 ]
 # %%
 with app.app_context():
@@ -111,3 +118,5 @@ with app.app_context():
 
     db.session.commit()
 
+
+# %%
