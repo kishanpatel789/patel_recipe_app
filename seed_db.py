@@ -69,18 +69,45 @@ with open("./seed_data/data_user.csv", 'r') as f:
         values = line.replace(',')
 
 # %%
-with open('./seed_data/data_user.csv', newline='\n') as csvfile:
-    csv_users = []
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        u = User()
-        for key, value in row.items():
-            setattr(u, key, value)
-        csv_users.append(u)
-
+seed_map = [
+    {
+        'name': 'user',
+        'cls': User,
+        'file': 'data_user.csv',
+        'dt_cols': [],
+    },
+    {
+        'name': 'recipe',
+        'cls': Recipe,
+        'file': 'data_recipe.csv',
+        'dt_cols': ['date_created', 'date_modified'],
+    },
+]
+# %%
 with app.app_context():
-    for u in csv_users:
-        db.session.add(u)
+    db.drop_all()
+    db.create_all()
+
+    for mapper in seed_map:
+        print(mapper['name'])
+        mod_inst_items = []
+
+        with open(f'./seed_data/{mapper["file"]}', newline='\n') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                print(row)
+                mod_inst = mapper['cls']()
+                for key, value in row.items():
+                    if key in mapper['dt_cols']:
+                        if value != '':
+                            value = datetime.strptime(value, '%Y-%m-%d')
+                        else:
+                            value = None
+                    setattr(mod_inst, key, value)
+                mod_inst_items.append(mod_inst)
+
+        for mod_inst in mod_inst_items:
+            db.session.add(mod_inst)
+
     db.session.commit()
 
-# %%
