@@ -2,6 +2,11 @@ from datetime import datetime
 # from marshmallow_sqlalchemy import fields
 from config import db, ma
 
+recipe_tag = db.Table(
+    "recipe_tag",
+    db.Column("recipe_id", db.ForeignKey("recipe.id"), primary_key=True),
+    db.Column("tag_id", db.ForeignKey("tag.id"), primary_key=True),
+)
 
 class Recipe(db.Model):
     __tablename__ = "recipe"
@@ -19,8 +24,14 @@ class Recipe(db.Model):
     )
     modified_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    tags = db.relationship(
+       "Tag", 
+       secondary=recipe_tag, 
+       lazy="joined",
+    )
+
     def __repr__(self):
-        return '<Recipe %r>' % self.name
+        return f"<Recipe {self.name}>"
 
 
 class User(db.Model):
@@ -31,24 +42,23 @@ class User(db.Model):
     role = db.Column(db.String, nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.user_name
+        return f"<User {self.user_name}>"
 
 class Tag(db.Model):
     __tablename__ = "tag"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
 
-
-recipe_tag = db.Table(
-    "recipe_tag",
-    db.Column("recipe_id", db.ForeignKey(Recipe.id), primary_key=True),
-    db.Column("tag_id", db.ForeignKey(Tag.id), primary_key=True),
-)
+    def __repr__(self):
+        return f"<Tag {self.id} {self.name}>"
 
 class Unit(db.Model):
     __tablename__ = "unit"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"<Unit {self.id} {self.name}>"
 
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
@@ -61,6 +71,9 @@ class Ingredient(db.Model):
                         nullable=False)
     item = db.Column(db.String, nullable=False)
 
+    def __repr__(self):
+        return f"<Ingredient {self.item}>"
+
 class Direction(db.Model):
     __tablename__ = "direction"
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +81,9 @@ class Direction(db.Model):
                           nullable=False)
     order_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String, nullable=False)
+
+    def __repr__(self):
+        return f"<Direction {self.recipe_id} {self.order_id}>"
 
 complementary_dish = db.Table(
     "complementary_dish",
