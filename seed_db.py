@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from config import app, db
-from models import User, Recipe, Tag
+from models import User, Recipe, Tag, recipe_tag
 
 import csv
 
@@ -87,7 +87,14 @@ seed_map = [
         'cls': Tag,
         'file': 'data_tag.csv',
         'dt_cols': [],
+    }
+]
 
+seed_map_assoc = [
+    {
+        'name': 'recipe_tag',
+        'tbl': recipe_tag,
+        'file': 'data_recipetag.csv',
     }
 ]
 # %%
@@ -95,6 +102,7 @@ with app.app_context():
     db.drop_all()
     db.create_all()
 
+    # models
     for mapper in seed_map:
         print(mapper['name'])
         mod_inst_items = []
@@ -116,7 +124,39 @@ with app.app_context():
         for mod_inst in mod_inst_items:
             db.session.add(mod_inst)
 
+    # association tables
+    for mapper in seed_map_assoc:
+        print(mapper['name'])
+        records = []
+        with open(f'./seed_data/{mapper["file"]}', newline='\n') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                print(row)
+                records.append(row)
+        multiple_insert = mapper['tbl'].insert().values(records)
+        db.session.execute(multiple_insert)
+
     db.session.commit()
 
 
+# %%
+# with app.app_context():
+#     records = []
+#     with open(f'./seed_data/data_recipetag.csv', newline='\n') as csvfile:
+#         reader = csv.DictReader(csvfile)
+#         for row in reader:
+#             records.append(row)
+
+#     multiple_insert = recipe_tag.insert().values(records)
+#     db.session.execute(multiple_insert)
+
+#     db.session.commit()
+
+# # %%
+# with open(f'./seed_data/data_recipetag.csv', newline='\n') as csvfile:
+#     records = []
+#     reader = csv.DictReader(csvfile)
+#     for row in reader:
+#         records.append(row)
+#     print(values)
 # %%
