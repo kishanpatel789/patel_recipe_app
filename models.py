@@ -89,3 +89,14 @@ complementary_dish = db.Table(
     db.Column("recipe_id", db.ForeignKey(Recipe.id), primary_key=True),
     db.Column("comp_recipe_id", db.ForeignKey(Recipe.id), primary_key=True),
 )
+
+
+class RecipeSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Recipe
+        load_instance = True
+        sqla_session = db.session
+        include_relationships = True
+
+recipe_schema = RecipeSchema()
+recipes_schema = RecipeSchema(many=True)

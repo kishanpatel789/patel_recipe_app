@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  title: "Patel Recipe App"
+  description: "An API about recipes"
+  version: "1.0.0"
+
+servers:
+  - url: "/api"
+
+paths:
+  /recipe:
+    get:
+      operationId: "recipe.read_all"
+      tags:
+        - "Recipe"
+      summary: "Read the list of recipes"
+      responses:
+        "200":
+          description: "Successfully read recipe list"
