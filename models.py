@@ -66,9 +66,8 @@ class Ingredient(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"),
                           nullable=False)
     order_id = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Float, nullable=False)
-    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"),
-                        nullable=False)
+    quantity = db.Column(db.Float)
+    unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     item = db.Column(db.String, nullable=False)
 
     def __repr__(self):

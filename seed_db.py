@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from config import app, db
-from models import User, Recipe, Tag, recipe_tag
+from models import User, Recipe, Tag, recipe_tag, Unit, Ingredient
 
 import csv
 
@@ -75,19 +75,36 @@ seed_map = [
         'cls': User,
         'file': 'data_user.csv',
         'dt_cols': [],
+        'float_cols': [],
     },
     {
         'name': 'recipe',
         'cls': Recipe,
         'file': 'data_recipe.csv',
         'dt_cols': ['date_created', 'date_modified'],
+        'float_cols': [],
     },
     {
         'name': 'tag',
         'cls': Tag,
         'file': 'data_tag.csv',
         'dt_cols': [],
-    }
+        'float_cols': [],
+    },
+    {
+        'name': 'unit',
+        'cls': Unit,
+        'file': 'data_unit.csv',
+        'dt_cols': [],
+        'float_cols': [],
+    },
+    {
+        'name': 'ingredient',
+        'cls': Ingredient,
+        'file': 'data_ingredient.csv',
+        'dt_cols': [],
+        'float_cols': ['quantity'],
+    },
 ]
 
 seed_map_assoc = [
@@ -117,6 +134,9 @@ with app.app_context():
                         if value != '':
                             value = datetime.strptime(value, '%Y-%m-%d')
                         else:
+                            value = None
+                    if key in mapper['float_cols']:
+                        if value == '':
                             value = None
                     setattr(mod_inst, key, value)
                 mod_inst_items.append(mod_inst)
