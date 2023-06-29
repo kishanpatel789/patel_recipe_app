@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from config import app, db
-from models import User, Recipe, Tag, recipe_tag, Unit, Ingredient
+from models import User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish
 
 import csv
 
@@ -105,6 +105,13 @@ seed_map = [
         'dt_cols': [],
         'float_cols': ['quantity'],
     },
+    {
+        'name': 'direction',
+        'cls': Direction,
+        'file': 'data_direction.csv',
+        'dt_cols': [],
+        'float_cols': [],
+    },
 ]
 
 seed_map_assoc = [
@@ -112,7 +119,12 @@ seed_map_assoc = [
         'name': 'recipe_tag',
         'tbl': recipe_tag,
         'file': 'data_recipetag.csv',
-    }
+    },
+    {
+        'name': 'complementary_dish',
+        'tbl': complementary_dish,
+        'file': 'data_complementarydish.csv',
+    },
 ]
 # %%
 with app.app_context():
