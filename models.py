@@ -1,5 +1,5 @@
 from datetime import datetime
-# from marshmallow_sqlalchemy import fields
+from marshmallow_sqlalchemy import fields
 from config import db, ma
 
 recipe_tag = db.Table(
@@ -91,12 +91,23 @@ complementary_dish = db.Table(
 )
 
 
+class TagSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Tag
+        load_instance = True
+        sqla_session = db.session
+        include_fk = True
+
+tag_schema = TagSchema()
+
 class RecipeSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Recipe
         load_instance = True
         sqla_session = db.session
         include_relationships = True
+
+    tags = fields.Nested(TagSchema, many=True)
 
 recipe_schema = RecipeSchema()
 recipes_schema = RecipeSchema(many=True)
