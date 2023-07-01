@@ -109,5 +109,18 @@ class RecipeSchema(ma.SQLAlchemyAutoSchema):
 
     tags = fields.Nested(TagSchema, many=True)
 
+class IngredientSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Ingredient
+        load_instance = True
+        sqla_session = db.session
+        include_relationships = True
+        include_fk = True
+
+
+
+
 recipe_schema = RecipeSchema()
 recipes_schema = RecipeSchema(many=True)
+ingredient_schema = IngredientSchema()
+ingredients_schema = IngredientSchema(many=True)

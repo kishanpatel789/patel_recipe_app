@@ -16,6 +16,13 @@ components:
       required: true
       schema:
         type: "integer"
+    ingredient_id:
+      name: "ingredient_id"
+      description: "ID of the ingredient"
+      in: path
+      required: true
+      schema:
+        type: "integer"
 
 paths:
   /recipe:
@@ -38,3 +45,25 @@ paths:
       responses:
         "200":
           description: "Successfully read recipe"
+  /ingredients/{recipe_id}:
+    get:
+      operationId: "ingredient.read_all"
+      tags:
+        - "Ingredient"
+      summary: "Read the ingredients for a recipe"
+      parameters:
+        - $ref: "#/components/parameters/recipe_id"
+      responses:
+        "200":
+          description: "Successfully read ingredient list"
+  /ingredient/{ingredient_id}:
+    get:
+      operationId: "ingredient.read_one"
+      tags:
+        - "Ingredient"
+      summary: "Read one ingredient"
+      parameters:
+        - $ref: "#/components/parameters/ingredient_id"
+      responses:
+        "200":
+          description: "Successfully read ingredient"
