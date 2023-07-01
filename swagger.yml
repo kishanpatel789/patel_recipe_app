@@ -7,6 +7,16 @@ info:
 servers:
   - url: "/api"
 
+components:
+  parameters:
+    recipe_id:
+      name: "recipe_id"
+      description: "ID of the recipe"
+      in: path
+      required: true
+      schema:
+        type: "integer"
+
 paths:
   /recipe:
     get:
@@ -17,3 +27,14 @@ paths:
       responses:
         "200":
           description: "Successfully read recipe list"
+  /recipe/{recipe_id}:
+    get:
+      operationId: "recipe.read_one"
+      tags:
+        - "Recipe"
+      summary: "Read one recipe"
+      parameters:
+        - $ref: "#/components/parameters/recipe_id"
+      responses:
+        "200":
+          description: "Successfully read recipe"
