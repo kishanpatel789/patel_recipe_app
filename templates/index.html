@@ -6,7 +6,12 @@
 </head>
 <body>
     <h1>
-        Hello, World!
+        Patel Recipes
     </h1>
+    <ul>
+    {% for r in recipes %}
+        <li>{{r.name}}</li>
+    {%endfor%}
+    </ul>
 </body>
 </html>
