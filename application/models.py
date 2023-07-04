@@ -1,11 +1,18 @@
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from marshmallow_sqlalchemy import fields
-from config import db, ma
+
+db = SQLAlchemy()
 
 recipe_tag = db.Table(
     "recipe_tag",
     db.Column("recipe_id", db.ForeignKey("recipe.id"), primary_key=True),
     db.Column("tag_id", db.ForeignKey("tag.id"), primary_key=True),
+)
+
+complementary_dish = db.Table(
+    "complementary_dish",
+    db.Column("recipe_id", db.ForeignKey("recipe.id"), primary_key=True),
+    db.Column("comp_recipe_id", db.ForeignKey('recipe.id'), primary_key=True),
 )
 
 class Recipe(db.Model):
@@ -83,44 +90,3 @@ class Direction(db.Model):
 
     def __repr__(self):
         return f"<Direction {self.recipe_id} {self.order_id}>"
-
-complementary_dish = db.Table(
-    "complementary_dish",
-    db.Column("recipe_id", db.ForeignKey(Recipe.id), primary_key=True),
-    db.Column("comp_recipe_id", db.ForeignKey(Recipe.id), primary_key=True),
-)
-
-
-class TagSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Tag
-        load_instance = True
-        sqla_session = db.session
-        include_fk = True
-
-tag_schema = TagSchema()
-
-class RecipeSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Recipe
-        load_instance = True
-        sqla_session = db.session
-        include_relationships = True
-
-    tags = fields.Nested(TagSchema, many=True)
-
-class IngredientSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Ingredient
-        load_instance = True
-        sqla_session = db.session
-        include_relationships = True
-        include_fk = True
-
-
-
-
-recipe_schema = RecipeSchema()
-recipes_schema = RecipeSchema(many=True)
-ingredient_schema = IngredientSchema()
-ingredients_schema = IngredientSchema(many=True)
