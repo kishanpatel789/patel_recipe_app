@@ -8,6 +8,22 @@ servers:
   - url: "/api"
 
 components:
+  schemas:
+    Recipe:
+      type: "object"
+      required:
+        - name
+      properties:
+        name:
+          type: "string"
+        date_created:
+          type: "string"
+        date_modified:
+          type: "string"
+        created_by:
+          type: "integer"
+        modified_by:
+          type: "integer"
   parameters:
     recipe_id:
       name: "recipe_id"
@@ -34,6 +50,22 @@ paths:
       responses:
         "200":
           description: "Successfully read recipe list"
+    post:
+      operationId: "recipe.create"
+      tags:
+        - Recipe
+      summary: "Create a recipe"
+      requestBody:
+          description: "Recipe to create"
+          required: True
+          content:
+            application/json:
+              schema:
+                x-body-name: "recipe"
+                $ref: "#/components/schemas/Recipe"
+      responses:
+        "201":
+          description: "Successfully created recipe"
   /recipe/{recipe_id}:
     get:
       operationId: "recipe.read_one"
