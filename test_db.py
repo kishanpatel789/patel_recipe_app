@@ -12,8 +12,12 @@ with app.app_context():
         db.select(Recipe).where(Recipe.id==1)
     ).scalars().unique().one_or_none()
 
+    comp = rep.complementary_dishes.all()
+
     ingredients = db.session.execute(
-        db.select(Ingredient).join(Ingredient.unit).where(Ingredient.recipe_id==1)
+        db.select(Ingredient).where(Ingredient.recipe_id==1)
     ).scalars().unique().all()
+
+    # comp_dish = db.
 
 # %%

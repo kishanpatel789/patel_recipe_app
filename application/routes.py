@@ -1,7 +1,7 @@
 from flask import render_template, make_response, abort
 from flask import current_app as app
 
-from .models import db, Recipe, Ingredient, Direction
+from .models import db, Recipe, Ingredient, Direction, Tag
 
 
 @app.route("/")
@@ -12,7 +12,7 @@ def home():
     
     return render_template("index.html", recipes=recipes)
 
-
+# recipe
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def show_recipe(recipe_id):
@@ -38,6 +38,19 @@ def show_recipe(recipe_id):
         )
     else:
         abort(404)
+
+# tag
+@app.route('/tag', methods=['GET'])
+def show_tags():
+    # query database
+    tags = db.session.execute(
+        db.select(Tag)
+    ).scalars().all()
+
+    return render_template(
+        'tag.html', 
+        tags=tags, 
+    )
 
 @app.errorhandler(404)
 def page_not_found(error):
