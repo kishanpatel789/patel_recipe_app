@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Patel Recipes</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block content %}
     <h1>
         Patel Recipes
     </h1>
     <ul>
-    {% for r in recipes %}
-        <li>{{r.name}}</li>
+    {% for recipe in recipes %}
+        <div>
+            <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}">{{recipe.name}}</a>
+        </div>
     {%endfor%}
     </ul>
-</body>
-</html>
+{% endblock %}

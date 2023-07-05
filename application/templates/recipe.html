@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{recipe.name}}{% endblock %}
+
+
+{% block content %}
+
+  <h1>{{recipe.name}}</h1>
+
+  <div id="ingredients">
+    <h2>Ingredients</h2>
+    <ul>
+      {% for item in ingredients %}
+
+        <li>
+          {% if item.quantity %}
+            {{ item.item }}: {{item.quantity}} {{item.unit.name}}
+          {% else %}
+            {{ item.item }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div id="directions">
+    <h2>Directions</h2>
+    <ol>
+      {% for item in directions %}
+        <li>{{item.description}}</li>
+      {% endfor %}
+    </ol>
+  </div>
+
+  {% if recipe.complementary_dishes %}
+  <div id="complementaryDishes">
+    <h2>Complementary Dishes</h2>
+    <ul>
+      {% for comp in recipe.complementary_dishes %}
+        <li>
+          <a href="{{url_for('show_recipe', recipe_id=comp.id)}}">{{comp.name}}</a>
+        </li>
+      {% endfor %}
+      
+    </ul>
+  </div>
+  {% endif %}
+
+  <div id="tags">
+    <span>
+    {% for tag in recipe.tags %}
+      #{{tag.name}}
+    {% endfor %}
+    </span>
+  </div>
+  
+{% endblock %}

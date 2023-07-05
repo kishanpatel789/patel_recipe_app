@@ -37,6 +37,14 @@ class Recipe(db.Model):
        lazy="joined",
     )
 
+    complementary_dishes = db.relationship(
+        "Recipe",
+        secondary=complementary_dish,
+        primaryjoin=(complementary_dish.c.recipe_id == id),
+        secondaryjoin=(complementary_dish.c.comp_recipe_id == id),
+        lazy="select"
+    )
+
     def __repr__(self):
         return f"<Recipe {self.name}>"
 
@@ -76,6 +84,11 @@ class Ingredient(db.Model):
     quantity = db.Column(db.Float)
     unit_id = db.Column(db.Integer, db.ForeignKey("unit.id"))
     item = db.Column(db.String, nullable=False)
+
+    unit = db.relationship(
+        Unit,
+        lazy="joined",
+    )
 
     def __repr__(self):
         return f"<Ingredient {self.item}>"
