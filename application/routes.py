@@ -56,7 +56,21 @@ def show_tags():
 def create_tag():
     form = TagForm()
     if form.validate_on_submit():
-        return redirect(url_for("show_tags"))
+        new_tag_name = form.name.data
+
+        existing_tag = db.session.execute(
+            db.select(Tag).where(Tag.name==new_tag_name)
+        ).scalars().one_or_none()
+        
+        if existing_tag:
+            return f"Tag '{new_tag_name}' already exists"
+        else:
+            new_tag = Tag(name=form.name.data)
+            db.session.add(new_tag)
+            db.session.commit()
+
+            return redirect(url_for("show_tags"))
+        
     return render_template(
         "create_tag.html",
         form=form,
