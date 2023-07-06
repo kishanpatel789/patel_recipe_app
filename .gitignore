@@ -5,3 +5,4 @@ __pycache__
 recipe.db
 seed_data/
 *.png
+.env

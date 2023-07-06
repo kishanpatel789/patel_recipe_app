@@ -1,7 +1,8 @@
-from flask import render_template, make_response, abort
+from flask import render_template, make_response, abort, redirect, url_for
 from flask import current_app as app
 
 from .models import db, Recipe, Ingredient, Direction, Tag
+from .forms import TagForm
 
 
 @app.route("/")
@@ -13,7 +14,6 @@ def home():
     return render_template("index.html", recipes=recipes)
 
 # recipe
-
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def show_recipe(recipe_id):
     # query database
@@ -51,6 +51,18 @@ def show_tags():
         'tag.html', 
         tags=tags, 
     )
+
+@app.route('/new-tag', methods=['GET', 'POST'])
+def create_tag():
+    form = TagForm()
+    if form.validate_on_submit():
+        return redirect(url_for("show_tags"))
+    return render_template(
+        "create_tag.html",
+        form=form,
+    )
+
+
 
 @app.errorhandler(404)
 def page_not_found(error):
