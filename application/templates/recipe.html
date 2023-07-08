@@ -8,7 +8,19 @@
 
   <div id="ingredients">
     <h2>Ingredients</h2>
-    <ul>
+    <div class="row row-cols-1 row-cols-sm-2">
+      {% for item in ingredients %}
+      <div class="col">
+        {% if item.quantity %}
+          {{ item.item }}: {{item.quantity}} {{item.unit.name}}
+        {% else %}
+          {{ item.item }}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  
+    <!-- <ul>
       {% for item in ingredients %}
 
         <li>
@@ -19,7 +31,7 @@
           {% endif %}
         </li>
       {% endfor %}
-    </ul>
+    </ul> -->
   </div>
 
   <div id="directions">
