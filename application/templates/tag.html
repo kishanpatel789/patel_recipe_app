@@ -9,7 +9,7 @@
     <ul>
       {% for tag in tags %}
         <li>
-          {{tag.name}}
+          {{tag.name}} <a href="{{ url_for('delete_tag', tag_id=tag.id) }}">Delete</a>
         </li>
       {% endfor %}
     </ul>
@@ -17,5 +17,24 @@
     <span>No tags found.</span>
   {%endif%}
   </div>
+
+  <h1>New Tag</h1>
+  
+    <form method="POST" action="{{ url_for('show_tags') }}">
+        <fieldset class="form-field">
+            {{ form.csrf_token }}
+            {{ form.name.label }}
+            {{ form.name(size=20) }}
+            {% if form.name.errors %}
+            <ul class="errors">
+                {% for error in form.name.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </fieldset>
+
+        {{ form.submit }}
+    </form>
 
 {% endblock %}

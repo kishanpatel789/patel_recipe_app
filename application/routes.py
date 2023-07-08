@@ -1,4 +1,5 @@
-from flask import render_template, make_response, abort, redirect, url_for
+from flask import render_template, make_response, abort, \
+    redirect, url_for, flash
 from flask import current_app as app
 
 from .models import db, Recipe, Ingredient, Direction, Tag
@@ -40,16 +41,36 @@ def show_recipe(recipe_id):
         abort(404)
 
 # tag
-@app.route('/tag', methods=['GET'])
+@app.route('/tag', methods=['GET', 'POST'])
 def show_tags():
     # query database
     tags = db.session.execute(
         db.select(Tag)
     ).scalars().all()
 
+    # prepare/process form
+    form = TagForm()
+    if form.validate_on_submit():
+        new_tag_name = form.name.data
+
+        existing_tag = db.session.execute(
+            db.select(Tag).where(Tag.name==new_tag_name)
+        ).scalars().one_or_none()
+        
+        if existing_tag:
+            flash(f"Tag '{new_tag_name}' already exists", "error")
+            return redirect(url_for("show_tags"))
+        else:
+            new_tag = Tag(name=form.name.data)
+            db.session.add(new_tag)
+            db.session.commit()
+
+            return redirect(url_for("show_tags"))
+
     return render_template(
         'tag.html', 
         tags=tags, 
+        form=form,
     )
 
 @app.route('/new-tag', methods=['GET', 'POST'])
@@ -76,6 +97,20 @@ def create_tag():
         form=form,
     )
 
+@app.route('/delete-tag/<int:tag_id>', methods=['GET'])
+def delete_tag(tag_id):
+    existing_tag = db.session.execute(
+        db.select(Tag).where(Tag.id==tag_id)
+    ).scalars().one_or_none()
+
+    if existing_tag:
+        db.session.delete(existing_tag)
+        db.session.commit()
+
+    return redirect(url_for("show_tags"))
+
+    
+    
 
 
 @app.errorhandler(404)

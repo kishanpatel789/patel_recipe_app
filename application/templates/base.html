@@ -11,6 +11,15 @@
   <body>
 
     <div id="header">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
     </div>
 
     <div id="content" class="container">
