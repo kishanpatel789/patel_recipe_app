@@ -10,7 +10,8 @@
     <h2>Ingredients</h2>
     <div class="row row-cols-1 row-cols-sm-2">
       {% for item in ingredients %}
-      <div class="col">
+      <div class="col">  
+        <input class="form-check-input" type="checkbox" value="">
         {% if item.quantity %}
           {{ item.item }}: {{item.quantity}} {{item.unit.name}}
         {% else %}
@@ -38,7 +39,9 @@
     <h2>Directions</h2>
     <ol>
       {% for item in directions %}
+        <span class="step">
         <li>{{item.description}}</li>
+        </span>
       {% endfor %}
     </ol>
   </div>
@@ -65,4 +68,16 @@
     </span>
   </div>
   
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+  $(document).ready(function() {
+    // Click event handler for recipe steps
+    $('.step').on('click', function() {
+      $(this).toggleClass('text-decoration-line-through');
+    });
+  });
+</script>
 {% endblock %}
