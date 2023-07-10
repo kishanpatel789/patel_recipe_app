@@ -10,6 +10,8 @@
       {% for tag in tags %}
         <li>
           {{tag.name}} <span class="delete-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}">Delete</span>
+          <i class="fa-regular fa-pen-to-square"></i>
+          <i class="fa-regular fa-trash-can delete-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}"></i>
           <!-- <a href="{{ url_for('delete_tag', tag_id=tag.id) }}">Delete</a> -->
         </li>
       {% endfor %}
@@ -39,7 +41,6 @@
     </form>
 
 
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-bs-whatever="@getbootstrap">Open modal for @getbootstrap</button>
 
   <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -53,7 +54,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger">Delete</button>
+          <a class="btn btn-danger" id="deleteButton">Delete</a>
         </div>
       </div>
     </div>
@@ -70,21 +71,19 @@
     $('.delete-button').on('click', function() {
       var tagId = $(this).data('tag-id');
       var tagName = $(this).data('tag-name');
-      
+
       // Update modal content based on the selected tag
       $('#confirmationModal .modal-body').text('Are you sure you want to delete the tag "' + tagName + '"?');
+
+      // Update modal delete button link
+      $('#deleteButton').off('click').on('click', function () {
+        window.location.href = '/delete-tag/' + tagId;
+        $('#confirmationModal').modal('hide');
+      });
       
       // Open the modal
       $('#confirmationModal').modal('show');
       
-      // Perform the delete action upon confirmation
-      $('#deleteButton').on('click', function() {
-        // Perform the delete operation for the tag with ID tagId
-        // ...
-        
-        // Close the modal
-        $('#confirmationModal').modal('hide');
-      });
     });
   });
 </script>
