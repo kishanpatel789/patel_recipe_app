@@ -9,8 +9,8 @@
     <ul>
       {% for tag in tags %}
         <li>
-          {{tag.name}} <span class="delete-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}">Delete</span>
-          <i class="fa-regular fa-pen-to-square"></i>
+          {{tag.name}}
+          <i class="fa-regular fa-pen-to-square" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}"></i>
           <i class="fa-regular fa-trash-can delete-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}"></i>
           <!-- <a href="{{ url_for('delete_tag', tag_id=tag.id) }}">Delete</a> -->
         </li>
@@ -67,7 +67,7 @@
 {{ super() }}
 <script>
   $(document).ready(function() {
-    // Click event handler for the delete button
+    // Click event handler for the delete icons
     $('.delete-button').on('click', function() {
       var tagId = $(this).data('tag-id');
       var tagName = $(this).data('tag-name');
