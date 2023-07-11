@@ -11,28 +11,19 @@
     <div class="row row-cols-1 row-cols-sm-2">
       {% for item in ingredients %}
       <div class="col">  
-        <input class="form-check-input" type="checkbox" value="">
-        {% if item.quantity %}
-          {{ item.item }}: {{item.quantity}} {{item.unit.name}}
-        {% else %}
-          {{ item.item }}
-        {% endif %}
+        <label>
+          <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
+          <span>
+            {% if item.quantity %}
+              {{ item.item }}: {{item.quantity}} {{item.unit.name}}
+            {% else %}
+              {{ item.item }}
+            {% endif %}
+          </span>
+        </label>
       </div>
       {% endfor %}
     </div>
-  
-    <!-- <ul>
-      {% for item in ingredients %}
-
-        <li>
-          {% if item.quantity %}
-            {{ item.item }}: {{item.quantity}} {{item.unit.name}}
-          {% else %}
-            {{ item.item }}
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul> -->
   </div>
 
   <div id="directions">
@@ -67,6 +58,8 @@
     {% endfor %}
     </span>
   </div>
+
+  <button type="button" class="btn btn-secondary" id="resetButton">Reset</button>
   
 {% endblock %}
 
@@ -77,6 +70,16 @@
     // Click event handler for recipe steps
     $('.step').on('click', function() {
       $(this).toggleClass('text-decoration-line-through');
+    });
+  });
+
+  $(document).ready(function() {
+    $('#resetButton').on('click', function() {
+      // Uncheck all ingredient checkboxes
+      $('.ingredient-checkbox').prop('checked', false);
+
+      // Remove line-through property from all steps
+      $('.step').removeClass('text-decoration-line-through');
     });
   });
 </script>
