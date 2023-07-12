@@ -97,6 +97,33 @@ def create_tag():
         form=form,
     )
 
+@app.route('/edit-tag/<int:tag_id>', methods=['GET', 'POST'])
+def edit_tag(tag_id):
+    existing_tag = db.session.execute(
+        db.select(Tag).where(Tag.id==tag_id)
+    ).scalars().one_or_none()
+
+    if not existing_tag:
+        abort(404)
+
+    form = TagForm()
+    
+    if form.validate_on_submit():
+        if existing_tag:
+            existing_tag.name = form.name.data
+            db.session.merge(existing_tag)
+            db.session.commit()      
+
+            return redirect(url_for("show_tags"))
+    form.id.data = existing_tag.id
+    form.name.data = existing_tag.name
+
+    return render_template(
+        "edit_tag.html",
+        form=form,
+    )
+
+
 @app.route('/delete-tag/<int:tag_id>', methods=['GET'])
 def delete_tag(tag_id):
     existing_tag = db.session.execute(

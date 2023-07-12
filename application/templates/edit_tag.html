@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Tags{% endblock %}
+
+{% block content %}
+
+    <h1>Edit Tag</h1>
+  
+    <form method="POST" action="{{ url_for('edit_tag', tag_id=form.id.data) }}">
+        <fieldset class="form-field">
+            {{ form.csrf_token }}
+            {{ form.name.label }}
+            {{ form.name(size=20) }}
+            {% if form.name.errors %}
+            <ul class="errors">
+                {% for error in form.name.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </fieldset>
+
+        {{ form.submit }}
+    </form>
+
+{% endblock %}
