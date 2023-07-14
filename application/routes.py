@@ -73,7 +73,7 @@ def show_tags():
         form=form,
     )
 
-@app.route('/new-tag', methods=['GET', 'POST'])
+@app.route('/tag/new', methods=['GET', 'POST'])
 def create_tag():
     form = TagForm()
     if form.validate_on_submit():
@@ -97,8 +97,9 @@ def create_tag():
         form=form,
     )
 
-@app.route('/edit-tag/<int:tag_id>', methods=['GET', 'POST'])
+@app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
 def edit_tag(tag_id):
+    # look up tag_id
     existing_tag = db.session.execute(
         db.select(Tag).where(Tag.id==tag_id)
     ).scalars().one_or_none()
@@ -106,17 +107,16 @@ def edit_tag(tag_id):
     if not existing_tag:
         abort(404)
 
-    form = TagForm()
+    # populate form with existing info (GET) or get submitted form info (POST)
+    form = TagForm(obj=existing_tag) # only uses obj if post request not supplied
     
+    # execute form logic for POST
     if form.validate_on_submit():
         if existing_tag:
-            existing_tag.name = form.name.data
+            form.populate_obj(existing_tag)
             db.session.merge(existing_tag)
             db.session.commit()      
-
             return redirect(url_for("show_tags"))
-    form.id.data = existing_tag.id
-    form.name.data = existing_tag.name
 
     return render_template(
         "edit_tag.html",
@@ -124,7 +124,7 @@ def edit_tag(tag_id):
     )
 
 
-@app.route('/delete-tag/<int:tag_id>', methods=['GET'])
+@app.route('/tag/delete/<int:tag_id>', methods=['GET'])
 def delete_tag(tag_id):
     existing_tag = db.session.execute(
         db.select(Tag).where(Tag.id==tag_id)
@@ -133,6 +133,8 @@ def delete_tag(tag_id):
     if existing_tag:
         db.session.delete(existing_tag)
         db.session.commit()
+    else:
+        flash(f"Tag with ID '{tag_id}' does not exist", "error")
 
     return redirect(url_for("show_tags"))
 
