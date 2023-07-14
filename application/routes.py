@@ -50,22 +50,22 @@ def show_tags():
 
     # prepare/process form
     form = TagForm()
-    if form.validate_on_submit():
-        new_tag_name = form.name.data
+    # if form.validate_on_submit():
+    #     new_tag_name = form.name.data
 
-        existing_tag = db.session.execute(
-            db.select(Tag).where(Tag.name==new_tag_name)
-        ).scalars().one_or_none()
+    #     existing_tag = db.session.execute(
+    #         db.select(Tag).where(Tag.name==new_tag_name)
+    #     ).scalars().one_or_none()
         
-        if existing_tag:
-            flash(f"Tag '{new_tag_name}' already exists", "error")
-            return redirect(url_for("show_tags"))
-        else:
-            new_tag = Tag(name=form.name.data)
-            db.session.add(new_tag)
-            db.session.commit()
+    #     if existing_tag:
+    #         flash(f"Tag '{new_tag_name}' already exists", "error")
+    #         return redirect(url_for("show_tags"))
+    #     else:
+    #         new_tag = Tag(name=form.name.data)
+    #         db.session.add(new_tag)
+    #         db.session.commit()
 
-            return redirect(url_for("show_tags"))
+    #         return redirect(url_for("show_tags"))
 
     return render_template(
         'tag.html', 
@@ -73,29 +73,33 @@ def show_tags():
         form=form,
     )
 
-@app.route('/tag/new', methods=['GET', 'POST'])
+@app.route('/tag/new', methods=['POST'])
 def create_tag():
     form = TagForm()
+
     if form.validate_on_submit():
         new_tag_name = form.name.data
 
+        # look for existing tag with name
         existing_tag = db.session.execute(
             db.select(Tag).where(Tag.name==new_tag_name)
         ).scalars().one_or_none()
         
         if existing_tag:
-            return f"Tag '{new_tag_name}' already exists"
+            flash(f"Tag '{new_tag_name}' already exists", "error")
         else:
-            new_tag = Tag(name=form.name.data)
+            # new_tag = Tag(name=form.name.data)
+            new_tag = Tag()
+            form.populate_obj(new_tag)
             db.session.add(new_tag)
             db.session.commit()
 
-            return redirect(url_for("show_tags"))
+    return redirect(url_for("show_tags"))
         
-    return render_template(
-        "create_tag.html",
-        form=form,
-    )
+    # return render_template(
+    #     "create_tag.html",
+    #     form=form,
+    # )
 
 @app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
 def edit_tag(tag_id):
@@ -116,12 +120,12 @@ def edit_tag(tag_id):
             form.populate_obj(existing_tag)
             db.session.merge(existing_tag)
             db.session.commit()      
-            return redirect(url_for("show_tags"))
+    return redirect(url_for("show_tags"))
 
-    return render_template(
-        "edit_tag.html",
-        form=form,
-    )
+    # return render_template(
+    #     "edit_tag.html",
+    #     form=form,
+    # )
 
 
 @app.route('/tag/delete/<int:tag_id>', methods=['GET'])

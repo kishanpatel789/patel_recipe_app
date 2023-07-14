@@ -9,8 +9,8 @@ class TagForm(FlaskForm):
         'Id',
     )
     name = StringField(
-        'Name',
+        'Tag Name',
         [DataRequired()],
     )
     
-    submit = SubmitField('Submit')
+    submit = SubmitField('Create')
