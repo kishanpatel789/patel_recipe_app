@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, InputRequired
 
 
 class TagForm(FlaskForm):
@@ -10,7 +10,8 @@ class TagForm(FlaskForm):
     )
     name = StringField(
         'Tag Name',
-        [DataRequired()],
+        [InputRequired(),
+         Length(min=1, max=20)],
     )
     
     submit = SubmitField('Create')

@@ -41,7 +41,7 @@ def show_recipe(recipe_id):
         abort(404)
 
 # tag
-@app.route('/tag', methods=['GET', 'POST'])
+@app.route('/tag/', methods=['GET', 'POST'])
 def show_tags():
     # query database
     tags = db.session.execute(
@@ -73,12 +73,14 @@ def show_tags():
         form=form,
     )
 
-@app.route('/tag/new', methods=['POST'])
+@app.route('/tag/new/', methods=['POST'])
 def create_tag():
     form = TagForm()
 
     if form.validate_on_submit():
         new_tag_name = form.name.data
+        # return dir(form)
+        # return "'" + new_tag_name + "'"
 
         # look for existing tag with name
         existing_tag = db.session.execute(
@@ -93,6 +95,10 @@ def create_tag():
             form.populate_obj(new_tag)
             db.session.add(new_tag)
             db.session.commit()
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
 
     return redirect(url_for("show_tags"))
         
@@ -109,17 +115,17 @@ def edit_tag(tag_id):
     ).scalars().one_or_none()
 
     if not existing_tag:
-        abort(404)
-
-    # populate form with existing info (GET) or get submitted form info (POST)
-    form = TagForm(obj=existing_tag) # only uses obj if post request not supplied
-    
-    # execute form logic for POST
-    if form.validate_on_submit():
-        if existing_tag:
-            form.populate_obj(existing_tag)
-            db.session.merge(existing_tag)
-            db.session.commit()      
+        flash(f"Tag with ID '{tag_id}' does not exist", "error")
+    else:
+        # populate form with existing info (GET) or get submitted form info (POST)
+        form = TagForm(obj=existing_tag) # only uses obj if post request not supplied
+        
+        # execute form logic for POST
+        if form.validate_on_submit():
+            if existing_tag:
+                form.populate_obj(existing_tag)
+                # db.session.merge(existing_tag)
+                db.session.commit()      
     return redirect(url_for("show_tags"))
 
     # return render_template(
@@ -141,9 +147,6 @@ def delete_tag(tag_id):
         flash(f"Tag with ID '{tag_id}' does not exist", "error")
 
     return redirect(url_for("show_tags"))
-
-    
-    
 
 
 @app.errorhandler(404)
