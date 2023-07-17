@@ -79,8 +79,6 @@ def create_tag():
 
     if form.validate_on_submit():
         new_tag_name = form.name.data
-        # return dir(form)
-        # return "'" + new_tag_name + "'"
 
         # look for existing tag with name
         existing_tag = db.session.execute(
@@ -102,11 +100,6 @@ def create_tag():
 
     return redirect(url_for("show_tags"))
         
-    # return render_template(
-    #     "create_tag.html",
-    #     form=form,
-    # )
-
 @app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
 def edit_tag(tag_id):
     # look up tag_id
