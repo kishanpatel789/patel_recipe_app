@@ -8,18 +8,14 @@
     Add Tag
   </button>
   
-  
   <div id="tags">
   {% if tags %}
     <ul>
       {% for tag in tags %}
         <li>
           {{tag.name}}
-          <!-- <a href="{{ url_for('edit_tag', tag_id=tag.id) }}" class="text-decoration-none"> -->
-            <i class="fa-regular fa-pen-to-square edit-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}" ></i>
-          <!-- </a> -->
+          <i class="fa-regular fa-pen-to-square edit-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}" ></i>
           <i class="fa-regular fa-trash-can delete-button" data-tag-id="{{tag.id}}" data-tag-name="{{tag.name}}"></i>
-          <!-- <a href="{{ url_for('delete_tag', tag_id=tag.id) }}">Delete</a> -->
         </li>
       {% endfor %}
     </ul>
@@ -27,27 +23,6 @@
     <span>No tags found.</span>
   {%endif%}
   </div>
-
-  <!-- <h1>New Tag</h1>
-  
-    <form method="POST" action="{{ url_for('show_tags') }}">
-        <fieldset class="form-field">
-            {{ form.csrf_token }}
-            {{ form.name.label }}
-            {{ form.name(size=20) }}
-            {% if form.name.errors %}
-            <ul class="errors">
-                {% for error in form.name.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        </fieldset>
-
-        {{ form.submit }}
-    </form> -->
-
-
 
   <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
