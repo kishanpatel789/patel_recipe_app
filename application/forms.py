@@ -27,4 +27,4 @@ class TagForm(FlaskForm):
         ]
     )
     
-    submit = SubmitField('Create')
+    submit = SubmitField('Submit')
