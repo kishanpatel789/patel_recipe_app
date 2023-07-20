@@ -12,7 +12,7 @@ def strip_whitespace(s):
     return s
 
 class TagForm(FlaskForm):
-    """Contact form."""
+    """Tag form."""
     id = IntegerField(
         'Id',
     )
@@ -21,6 +21,52 @@ class TagForm(FlaskForm):
         validators=[
             InputRequired(),
             Length(min=1, max=20)
+        ],
+        filters=[
+            strip_whitespace
+        ]
+    )
+    
+    submit = SubmitField('Submit')
+
+class UnitForm(FlaskForm):
+    """Unit form."""
+    id = IntegerField(
+        'Id',
+    )
+    name = StringField(
+        'Unit Name',
+        validators=[
+            InputRequired(),
+            Length(min=1, max=20)
+        ],
+        filters=[
+            strip_whitespace
+        ]
+    )
+    name_plural = StringField(
+        'Unit Name Plural',
+        validators=[
+            InputRequired(),
+            Length(min=1, max=20)
+        ],
+        filters=[
+            strip_whitespace
+        ]
+    )
+    abbr_singular = StringField(
+        'Unit Abbreviation',
+        validators=[
+            Length(max=20)
+        ],
+        filters=[
+            strip_whitespace
+        ]
+    )
+    abbr_plural = StringField(
+        'Unit Abbreviation Plural',
+        validators=[
+            Length(max=20)
         ],
         filters=[
             strip_whitespace
