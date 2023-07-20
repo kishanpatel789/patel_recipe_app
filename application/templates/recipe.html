@@ -14,10 +14,23 @@
         <label>
           <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
           <span>
+            {{ item.item }}
             {% if item.quantity %}
-              {{ item.item }}: {{item.quantity}} {{item.unit.name}}
-            {% else %}
-              {{ item.item }}
+              -  
+              {{item.quantity}} 
+              {% if item.quantity != 1 %}
+                {% if item.unit.abbr_plural %}
+                  {{ item.unit.abbr_plural }}
+                {% else %}
+                  {{ item.unit.name_plural }}
+                {% endif %}
+              {% else %}
+                {% if item.unit.abbr_singular %}
+                  {{ item.unit.abbr_singular }}
+                {% else %}
+                  {{ item.unit.name }}
+                {% endif %}
+              {% endif %}
             {% endif %}
           </span>
         </label>

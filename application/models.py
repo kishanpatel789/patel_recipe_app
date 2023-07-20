@@ -71,6 +71,9 @@ class Unit(db.Model):
     __tablename__ = "unit"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, nullable=False)
+    name_plural = db.Column(db.String, unique=True, nullable=False)
+    abbr_singular = db.Column(db.String)
+    abbr_plural = db.Column(db.String)
 
     def __repr__(self):
         return f"<Unit {self.id} {self.name}>"
