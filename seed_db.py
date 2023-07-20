@@ -2,10 +2,14 @@
 from datetime import datetime 
 from pathlib import Path
 
-from config import app, db
-from models import User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish
+# from config import db
+from application.models import db, User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish
+from application import create_app
 
 import csv
+
+# %%
+app = create_app()
 
 # %%
 # data_user = [
