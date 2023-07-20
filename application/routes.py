@@ -5,6 +5,13 @@ from flask import current_app as app
 from .models import db, Recipe, Ingredient, Direction, Tag
 from .forms import TagForm
 
+# register custom jinja filters
+def format_number(value):
+    if isinstance(value, float):
+        if int(value) == value:
+            return int(value)
+    return value
+app.jinja_env.filters['format_number'] = format_number
 
 @app.route("/")
 def home():
