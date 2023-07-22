@@ -146,14 +146,10 @@ with app.app_context():
                 print(row)
                 mod_inst = mapper['cls']()
                 for key, value in row.items():
-                    if key in mapper['dt_cols']:
-                        if value != '':
-                            value = datetime.strptime(value, '%Y-%m-%d')
-                        else:
-                            value = None
-                    if key in mapper['float_cols']:
-                        if value == '':
-                            value = None
+                    if value == '':  # overwrite empty value with None (null)
+                        value = None
+                    if key in mapper['dt_cols'] and value != None:
+                        value = datetime.strptime(value, '%Y-%m-%d')
                     setattr(mod_inst, key, value)
                 mod_inst_items.append(mod_inst)
 
