@@ -68,10 +68,8 @@
         </div>
         <form method="POST" action="{{ url_for('create_unit') }}">
           <div class="modal-body">
-            <fieldset class="form-field">
                 {{ form.csrf_token }}
-                {{ form.name.label }}
-                {{ form.name(size=20) }}
+                {{ form.name.label(class="form-label") }}{{ form.name(size=20, class="form-control") }}
                 {% if form.name.errors %}
                 <ul class="errors">
                   {% for error in form.name.errors %}
@@ -79,7 +77,9 @@
                   {% endfor %}
                 </ul>
                 {% endif %}
-            </fieldset>
+                {{ form.name_plural.label(class="form-label") }}{{ form.name_plural(size=20, class="form-control") }}
+                {{ form.abbr_singular.label(class="form-label") }}{{ form.abbr_singular(size=20, class="form-control") }}
+                {{ form.abbr_plural.label(class="form-label") }}{{ form.abbr_plural(size=20, class="form-control") }}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

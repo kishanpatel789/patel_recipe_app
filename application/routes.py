@@ -151,13 +151,40 @@ def show_units():
         db.select(Unit)
     ).scalars().all()
 
-    form = TagForm()
+    form = UnitForm()
 
     return render_template(
         'unit.html', 
         units=units, 
         form=form,
     )
+
+@app.route('/unit/new/', methods=['POST'])
+def create_unit():
+    form = UnitForm()
+
+    if form.validate_on_submit():
+        new_unit_name = form.name.data
+
+        # look for existing unit with name
+        existing_unit = db.session.execute(
+            db.select(Unit).where(Unit.name==new_unit_name)
+        ).scalars().one_or_none()
+        
+        if existing_unit:
+            flash(f"Unit '{new_unit_name}' already exists", "error")
+        else:
+            # new_tag = Tag(name=form.name.data)
+            new_unit = Tag()
+            form.populate_obj(new_unit)
+            db.session.add(new_unit)
+            db.session.commit()
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field}: {error}", "error")
+
+    return redirect(url_for("show_units"))
 
 @app.errorhandler(404)
 def page_not_found(error):
