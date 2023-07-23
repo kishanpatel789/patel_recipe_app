@@ -157,6 +157,7 @@ def show_units():
         'unit.html', 
         units=units, 
         form=form,
+        default='',
     )
 
 @app.route('/unit/new/', methods=['POST'])
@@ -174,8 +175,7 @@ def create_unit():
         if existing_unit:
             flash(f"Unit '{new_unit_name}' already exists", "error")
         else:
-            # new_tag = Tag(name=form.name.data)
-            new_unit = Tag()
+            new_unit = Unit()
             form.populate_obj(new_unit)
             db.session.add(new_unit)
             db.session.commit()

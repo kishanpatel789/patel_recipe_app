@@ -11,12 +11,17 @@ def strip_whitespace(s):
         return s.strip()
     return s
 
+def read_none(x):
+    return x or None
+
 class BaseForm(FlaskForm):
     class Meta:
         def bind_field(self, form, unbound_field, options):
             filters = unbound_field.kwargs.get('filters', [])
             if strip_whitespace not in filters:
                 filters.append(strip_whitespace)
+            if read_none not in filters:
+                filters.append(read_none)
             return unbound_field.bind(form=form, filters=filters, **options)
 
 class TagForm(BaseForm):
