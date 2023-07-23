@@ -186,6 +186,38 @@ def create_unit():
 
     return redirect(url_for("show_units"))
 
+@app.route('/unit/edit/<int:unit_id>', methods=['POST'])
+def edit_unit(unit_id):
+    # look up unit_id
+    existing_unit = db.session.execute(
+        db.select(Unit).where(Unit.id==unit_id)
+    ).scalars().one_or_none()
+
+    if not existing_unit:
+        flash(f"Unit with ID '{unit_id}' does not exist", "error")
+    else:
+        form = UnitForm() 
+        
+        # execute form logic for POST
+        if form.validate_on_submit():
+            form.populate_obj(existing_unit)
+            db.session.commit()      
+    return redirect(url_for("show_units"))
+
+@app.route('/unit/delete/<int:unit_id>', methods=['GET'])
+def delete_unit(unit_id):
+    existing_unit = db.session.execute(
+        db.select(Unit).where(Unit.id==unit_id)
+    ).scalars().one_or_none()
+
+    if existing_unit:
+        db.session.delete(existing_unit)
+        db.session.commit()
+    else:
+        flash(f"Unit with ID '{unit_id}' does not exist", "error")
+
+    return redirect(url_for("show_units"))
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
