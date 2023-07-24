@@ -57,22 +57,6 @@ def show_tags():
 
     # prepare/process form
     form = TagForm()
-    # if form.validate_on_submit():
-    #     new_tag_name = form.name.data
-
-    #     existing_tag = db.session.execute(
-    #         db.select(Tag).where(Tag.name==new_tag_name)
-    #     ).scalars().one_or_none()
-        
-    #     if existing_tag:
-    #         flash(f"Tag '{new_tag_name}' already exists", "error")
-    #         return redirect(url_for("show_tags"))
-    #     else:
-    #         new_tag = Tag(name=form.name.data)
-    #         db.session.add(new_tag)
-    #         db.session.commit()
-
-    #         return redirect(url_for("show_tags"))
 
     return render_template(
         'tag.html', 
@@ -95,7 +79,6 @@ def create_tag():
         if existing_tag:
             flash(f"Tag '{new_tag_name}' already exists", "error")
         else:
-            # new_tag = Tag(name=form.name.data)
             new_tag = Tag()
             form.populate_obj(new_tag)
             db.session.add(new_tag)
@@ -117,14 +100,13 @@ def edit_tag(tag_id):
     if not existing_tag:
         flash(f"Tag with ID '{tag_id}' does not exist", "error")
     else:
-        # populate form with existing info (GET) or get submitted form info (POST)
-        form = TagForm(obj=existing_tag) # only uses obj if post request not supplied
+        # populate form submitted form info or with existing info
+        form = TagForm(obj=existing_tag) 
         
-        # execute form logic for POST
+        # store form content 
         if form.validate_on_submit():
             if existing_tag:
                 form.populate_obj(existing_tag)
-                # db.session.merge(existing_tag)
                 db.session.commit()      
     return redirect(url_for("show_tags"))
 
@@ -196,9 +178,9 @@ def edit_unit(unit_id):
     if not existing_unit:
         flash(f"Unit with ID '{unit_id}' does not exist", "error")
     else:
+        # populate form submitted form info or with existing info
         form = UnitForm(obj=existing_unit) 
-        # target_keys = ['id', 'name', 'name_plural', 'abbr_singular', 'abbr_plural']
-        # return {k: form[k] for k in target_keys}
+
         # store form content
         if form.validate_on_submit():
             form.populate_obj(existing_unit)
