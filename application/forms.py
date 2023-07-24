@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField
+from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList
 from wtforms.validators import DataRequired, Length, InputRequired, Optional
 
 def strip_whitespace(s):
@@ -75,3 +75,45 @@ class UnitForm(BaseForm):
     )
     
     submit = SubmitField('Submit')
+
+class IngredientForm(BaseForm):
+    "Ingredient line item form"
+
+    id = IntegerField(
+        'Id',
+    )
+    recipe_id = IntegerField(
+        'Id',
+    )
+    order_id = IntegerField(
+        'Id',
+    )
+    quantity = FloatField(
+        'Quantity',
+        validators=[
+            InputRequired(),
+        ],
+    )
+    unit_id = StringField('Unit')
+    item = StringField(
+        'Item',
+        validators=[
+            InputRequired(),
+            Length(min=1, max=20)
+        ],
+    )
+
+class RecipeForm(BaseForm):
+    """Recipe form"""
+
+    id = IntegerField(
+        'Id',
+    )
+    name = StringField(
+        'Recipe Name',
+        validators=[
+            InputRequired(),
+            Length(min=1, max=20)
+        ],
+    )
+    ingredients = FieldList(FormField(IngredientForm), min_entries=1)

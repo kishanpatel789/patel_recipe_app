@@ -3,7 +3,7 @@ from flask import render_template, make_response, abort, \
 from flask import current_app as app
 
 from .models import db, Recipe, Ingredient, Direction, Tag, Unit
-from .forms import TagForm, UnitForm
+from .forms import TagForm, UnitForm, RecipeForm
 
 # register custom jinja filters
 def format_number(value):
@@ -46,6 +46,24 @@ def show_recipe(recipe_id):
         )
     else:
         abort(404)
+
+@app.route('/recipe/new/')
+def create_recipe():
+    form = RecipeForm()
+
+    return render_template(
+        'create_recipe.html',
+        form=form
+    )
+
+@app.route('/recipe/<int:recipe_id>', methods=['GET', 'POST'])
+def edit_recipe(recipe_id):
+    # query database
+    recipe = db.session.execute(
+        db.select(Recipe).where(Recipe.id==recipe_id)
+    ).scalars().unique().one_or_none()
+    
+    
 
 # tag
 @app.route('/tag/', methods=['GET'])
