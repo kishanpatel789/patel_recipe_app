@@ -196,9 +196,10 @@ def edit_unit(unit_id):
     if not existing_unit:
         flash(f"Unit with ID '{unit_id}' does not exist", "error")
     else:
-        form = UnitForm() 
-        
-        # execute form logic for POST
+        form = UnitForm(obj=existing_unit) 
+        # target_keys = ['id', 'name', 'name_plural', 'abbr_singular', 'abbr_plural']
+        # return {k: form[k] for k in target_keys}
+        # store form content
         if form.validate_on_submit():
             form.populate_obj(existing_unit)
             db.session.commit()      

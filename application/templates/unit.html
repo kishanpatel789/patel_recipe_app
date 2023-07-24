@@ -30,8 +30,10 @@
           <td>          
             <i class="fa-regular fa-pen-to-square edit-button mx-2" 
             data-unit-id="{{unit.id}}" 
-            data-unit-name="{{unit.name}}" data-unit-name-plural="{{unit.name_plural}}"
-            data-unit-abbr-singular="{{unit.abbr_singular}}" data-unit-abbr-plural="{{unit.abbr_plural}}"></i>
+            data-unit-name="{{unit.name}}" 
+            data-unit-name-plural="{{unit.name_plural}}"
+            data-unit-abbr-singular="{{unit.abbr_singular if unit.abbr_singular}}" 
+            data-unit-abbr-plural="{{unit.abbr_plural if unit.abbr_plural}}"></i>
             <i class="fa-regular fa-trash-can delete-button mx-2" data-unit-id="{{unit.id}}" data-unit-name="{{unit.name}}"></i>
           </td>
         </tr>
