@@ -1,6 +1,7 @@
 from flask import render_template, make_response, abort, \
-    redirect, url_for, flash
+    redirect, url_for, flash, request
 from flask import current_app as app
+import json
 
 from .models import db, Recipe, Ingredient, Direction, Tag, Unit
 from .forms import TagForm, UnitForm, RecipeForm
@@ -47,9 +48,19 @@ def show_recipe(recipe_id):
     else:
         abort(404)
 
-@app.route('/recipe/new/')
+@app.route('/recipe/new/', methods=['GET', 'POST'])
 def create_recipe():
-    form = RecipeForm()
+    if request.method == 'GET':
+        form = RecipeForm()
+
+        # dynamically determine unit options
+        units = db.session.execute(
+            db.select(Unit).order_by(Unit.name)
+        ).scalars().all()
+
+        for i in form.ingredients:
+            i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+
 
     return render_template(
         'create_recipe.html',

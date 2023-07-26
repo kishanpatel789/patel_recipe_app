@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList
+from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList, SelectField
 from wtforms.validators import DataRequired, Length, InputRequired, Optional
 
 def strip_whitespace(s):
@@ -18,10 +18,11 @@ class BaseForm(FlaskForm):
     class Meta:
         def bind_field(self, form, unbound_field, options):
             filters = unbound_field.kwargs.get('filters', [])
-            if strip_whitespace not in filters:
-                filters.append(strip_whitespace)
-            if read_none not in filters:
-                filters.append(read_none)
+            if not issubclass(unbound_field.field_class, FieldList):
+                if strip_whitespace not in filters:
+                    filters.append(strip_whitespace)
+                if read_none not in filters:
+                    filters.append(read_none)
             return unbound_field.bind(form=form, filters=filters, **options)
 
 class TagForm(BaseForm):
@@ -94,7 +95,7 @@ class IngredientForm(BaseForm):
             InputRequired(),
         ],
     )
-    unit_id = StringField('Unit')
+    unit_id = SelectField('Unit', coerce=int)
     item = StringField(
         'Item',
         validators=[
@@ -116,4 +117,4 @@ class RecipeForm(BaseForm):
             Length(min=1, max=20)
         ],
     )
-    ingredients = FieldList(FormField(IngredientForm), min_entries=1)
+    ingredients = FieldList(FormField(IngredientForm), min_entries=3)

@@ -5,8 +5,7 @@
 
     <h1>New Recipe</h1>
   
-    <form method="POST" action="{{ url_for('create_recipe') }}">
-        <fieldset class="form-field">
+    <form method="POST" >
             {{ form.csrf_token }}
             {{ form.name.label }}
             {{ form.name(size=20) }}
@@ -17,7 +16,17 @@
                 {% endfor %}
             </ul>
             {% endif %}
-        </fieldset>
+
+        {% for ingredient_field in form.ingredients %}
+        <div class="row">
+
+            {{ ingredient_field.item.label(class_='form-label') }} {{ ingredient_field.item(class='form-control') }}
+            {{ ingredient_field.quantity.label(class_='form-label') }} {{ ingredient_field.quantity(class='form-control') }}
+            {{ ingredient_field.unit_id.label(class_='form-label') }} {{ ingredient_field.unit_id(class='form-select') }}
+
+        </div>
+        {% endfor %}
+
 
         {{ form.submit }}
     </form>
