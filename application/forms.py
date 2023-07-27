@@ -117,4 +117,6 @@ class RecipeForm(BaseForm):
             Length(min=1, max=20)
         ],
     )
-    ingredients = FieldList(FormField(IngredientForm), min_entries=3)
+    ingredients = FieldList(FormField(IngredientForm), min_entries=1)
+
+    submit = SubmitField('Submit')

@@ -7,8 +7,8 @@
   
     <form method="POST" >
             {{ form.csrf_token }}
-            {{ form.name.label }}
-            {{ form.name(size=20) }}
+            {{ form.name.label(class_='form-label') }}
+            {{ form.name(class_='form-control') }}
             {% if form.name.errors %}
             <ul class="errors">
                 {% for error in form.name.errors %}
@@ -16,19 +16,74 @@
                 {% endfor %}
             </ul>
             {% endif %}
+        <h2 class="mt-3">Ingredients</h2>
+        <button type="button" id="remove-ingredient" class="btn btn-danger mt-3">-</button>
+        <button type="button" id="add-ingredient" class="btn btn-primary mt-3">+</button>
 
+        <div id="ingredient-container">
         {% for ingredient_field in form.ingredients %}
-        <div class="row">
-
-            {{ ingredient_field.item.label(class_='form-label') }} {{ ingredient_field.item(class='form-control') }}
-            {{ ingredient_field.quantity.label(class_='form-label') }} {{ ingredient_field.quantity(class='form-control') }}
-            {{ ingredient_field.unit_id.label(class_='form-label') }} {{ ingredient_field.unit_id(class='form-select') }}
-
-        </div>
+        <div class="row g-3 mb-2">
+            <div class="col-sm-7">
+                {{ ingredient_field.item(class_='form-control', placeholder='item') }}
+            </div>
+            <div class="col-sm">
+                {{ ingredient_field.quantity(class_='form-control', placeholder='quantity') }}
+            </div>
+            <div class="col-sm">
+                {{ ingredient_field.unit_id(class_='form-select', placeholder='unit') }}
+            </div>
+          </div>
         {% endfor %}
+        </div>
+        
+
+        <h2 class="mt-3">Directions</h2>
 
 
-        {{ form.submit }}
+        {{ form.submit(class="btn btn-primary") }}
     </form>
 
+{% endblock %}
+
+{% block scripts %}
+{{super()}}
+<script>
+    $(document).ready(function() {
+        // Keep track of the ingredient line count
+        var ingredientCount = 1;
+
+        // Maximum number of ingredient lines allowed (change as needed)
+        var maxIngredients = 20;
+
+        // Add ingredient line when "Add Ingredient" button is clicked
+        $("#add-ingredient").click(function() {
+            if (ingredientCount < maxIngredients) {
+                // Clone the first ingredient line and update the IDs
+                var newIngredient = $("#ingredient-container .row").first().clone();
+                newIngredient.find("input, select").each(function() {
+                    var oldId = $(this).attr("id");
+                    var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
+                    $(this).attr("id", newId);
+                });
+
+                // Clear the values in the cloned inputs
+                newIngredient.find("input[type='text']").val("");
+                newIngredient.find("select").val("-1");
+
+                // Append the new ingredient line to the container
+                $("#ingredient-container").append(newIngredient);
+
+                ingredientCount++;
+            }
+        });
+
+        // Remove latest ingredient line when "Remove Latest Ingredient" button is clicked
+        $("#remove-ingredient").click(function() {
+            if (ingredientCount > 1) {
+                $("#ingredient-container .row").last().remove();
+                ingredientCount--;
+            }
+        });
+    });
+</script>
 {% endblock %}
