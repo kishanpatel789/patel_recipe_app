@@ -50,6 +50,7 @@ def show_recipe(recipe_id):
 
 @app.route('/recipe/new/', methods=['GET', 'POST'])
 def create_recipe():
+
     if request.method == 'GET':
         form = RecipeForm()
 
@@ -57,9 +58,13 @@ def create_recipe():
         units = db.session.execute(
             db.select(Unit).order_by(Unit.name)
         ).scalars().all()
-
         for i in form.ingredients:
             i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+    
+    else: 
+        form = RecipeForm()
+
+        return request.form #form.data
 
 
     return render_template(

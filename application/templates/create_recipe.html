@@ -64,6 +64,10 @@
                     var oldId = $(this).attr("id");
                     var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
                     $(this).attr("id", newId);
+
+                    var oldName = $(this).attr("name");
+                    var newName = oldName.replace("-0-", "-" + ingredientCount + "-");
+                    $(this).attr("name", newName);
                 });
 
                 // Clear the values in the cloned inputs
