@@ -94,6 +94,7 @@ class IngredientForm(BaseForm):
         validators=[
             InputRequired(),
         ],
+        render_kw={'type': 'number', 'step': 'any'}
     )
     unit_id = SelectField('Unit', coerce=int)
     item = StringField(
