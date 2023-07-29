@@ -58,7 +58,7 @@
         // Add ingredient line when "Add Ingredient" button is clicked
         $("#add-ingredient").click(function() {
             if (ingredientCount < maxIngredients) {
-                // Clone the first ingredient line and update the IDs
+                // Clone the first ingredient line; update ID and name attribute
                 var newIngredient = $("#ingredient-container .row").first().clone();
                 newIngredient.find("input, select").each(function() {
                     var oldId = $(this).attr("id");
@@ -71,7 +71,7 @@
                 });
 
                 // Clear the values in the cloned inputs
-                newIngredient.find("input[type='text']").val("");
+                newIngredient.find("input").val("");
                 newIngredient.find("select").val("-1");
 
                 // Append the new ingredient line to the container

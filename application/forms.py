@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+import wtforms
 from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList, SelectField
 from wtforms.validators import DataRequired, Length, InputRequired, Optional
 
@@ -14,16 +15,34 @@ def strip_whitespace(s):
 def read_none(x):
     return x or None
 
+
+
+class Meta:
+    @staticmethod
+    def bind_field(form, unbound_field, options):
+        filters = unbound_field.kwargs.get('filters', [])
+        if not issubclass(unbound_field.field_class, FieldList):
+            if strip_whitespace not in filters:
+                filters.append(strip_whitespace)
+            if read_none not in filters:
+                filters.append(read_none)
+        return unbound_field.bind(form=form, filters=filters, **options)
+
+class BaseFormUnsecure(wtforms.Form): # used for form field
+    Meta = Meta
+
 class BaseForm(FlaskForm):
-    class Meta:
-        def bind_field(self, form, unbound_field, options):
-            filters = unbound_field.kwargs.get('filters', [])
-            if not issubclass(unbound_field.field_class, FieldList):
-                if strip_whitespace not in filters:
-                    filters.append(strip_whitespace)
-                if read_none not in filters:
-                    filters.append(read_none)
-            return unbound_field.bind(form=form, filters=filters, **options)
+    Meta = Meta
+    # class Meta:
+    #     def bind_field(self, form, unbound_field, options):
+    #         filters = unbound_field.kwargs.get('filters', [])
+    #         if not issubclass(unbound_field.field_class, FieldList):
+    #             if strip_whitespace not in filters:
+    #                 filters.append(strip_whitespace)
+    #             if read_none not in filters:
+    #                 filters.append(read_none)
+    #         return unbound_field.bind(form=form, filters=filters, **options)
+
 
 class TagForm(BaseForm):
     """Tag form."""
@@ -77,7 +96,7 @@ class UnitForm(BaseForm):
     
     submit = SubmitField('Submit')
 
-class IngredientForm(BaseForm):
+class IngredientForm(BaseFormUnsecure):
     "Ingredient line item form"
 
     id = IntegerField(

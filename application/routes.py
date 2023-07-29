@@ -63,22 +63,31 @@ def create_recipe():
     if form.validate_on_submit():
         # update recipe model
         recipe_orm = Recipe()
-        form.populate_obj(recipe_orm)
+        return [dir(recipe_orm), form.data]
+        # form.populate_obj(recipe_orm)
 
-        # TEMP UPDATE
-        recipe_orm.created_by = 'kishan'
+        # # TEMP UPDATE
+        # recipe_orm.created_by = 'kishan'
         
-        # return recipe_orm
-        db.session.add(recipe_orm)
+        # # return recipe_orm
+        # db.session.add(recipe_orm)
 
-        # update ingredient model
+        # # update ingredient model
 
-        # update direction model
+        # # update direction model
 
-        db.session.commit()
+        # db.session.commit()
 
 
-        return redirect(url_for('home'))
+        # return redirect(url_for('home'))
+    
+    if request.method == 'POST' and form.errors:
+        
+
+        return form.errors
+        # for field, errors in form.errors.items():
+        #         for error in errors:
+        #             flash(f"{field}: {error}", "error")
 
     return render_template(
         'create_recipe.html',
