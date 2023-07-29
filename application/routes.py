@@ -51,21 +51,34 @@ def show_recipe(recipe_id):
 @app.route('/recipe/new/', methods=['GET', 'POST'])
 def create_recipe():
 
-    if request.method == 'GET':
-        form = RecipeForm()
+    form = RecipeForm()
 
-        # dynamically determine unit options
-        units = db.session.execute(
-            db.select(Unit).order_by(Unit.name)
-        ).scalars().all()
-        for i in form.ingredients:
-            i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+    # dynamically determine unit options
+    units = db.session.execute(
+        db.select(Unit).order_by(Unit.name)
+    ).scalars().all()
+    for i in form.ingredients:
+        i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
     
-    else: 
-        form = RecipeForm()
+    if form.validate_on_submit():
+        # update recipe model
+        recipe_orm = Recipe()
+        form.populate_obj(recipe_orm)
 
-        return request.form #form.data
+        # TEMP UPDATE
+        recipe_orm.created_by = 'kishan'
+        
+        # return recipe_orm
+        db.session.add(recipe_orm)
 
+        # update ingredient model
+
+        # update direction model
+
+        db.session.commit()
+
+
+        return redirect(url_for('home'))
 
     return render_template(
         'create_recipe.html',
