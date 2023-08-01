@@ -62,25 +62,40 @@ def create_recipe():
     
     if form.validate_on_submit():
         # check for existing recipe with name
+        existing_recipe = db.session.execute(
+            db.select(Recipe).where(Recipe.name==form.name.data)
+        ).scalars().unique().one_or_none()
 
-        # update recipe model
-        recipe_orm = Recipe()
-        recipe_orm.name = form.name.data
+        if existing_recipe:
+            flash(f"Recipe with '{form.name.data}' already exists")
+        else:
 
-        # TEMP UPDATE
-        recipe_orm.created_by = 'kishan'
-        
-        db.session.add(recipe_orm)
-        # get new recipe_id? 
+            # update recipe model
+            recipe_orm = Recipe(
+                name=form.name.data,
+                created_by = 'kishan'  # TEMP UPDATE; re-do later with logged in user
+            )
+            db.session.add(recipe_orm)
+            db.session.commit()
+            db.session.refresh(recipe_orm)
 
-        # update ingredient model
+            # update ingredient model
+            for i, ingredient in enumerate(form.ingredients):
+                ingredient_orm = Ingredient(
+                    recipe_id = recipe_orm.id,
+                    order_id = i+1,
+                    quantity = ingredient.quantity.data,
+                    unit_id = ingredient.unit_id.data,
+                    item = ingredient.item.data,
+                )
+                db.session.add(ingredient_orm)
+            db.session.commit()
 
-        # update direction model
-
-        db.session.commit()
+            # update direction model
 
 
-        return redirect(url_for('home'))
+
+            return redirect(url_for('home'))
     
     if request.method == 'POST' and form.errors:
         
