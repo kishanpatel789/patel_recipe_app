@@ -61,25 +61,26 @@ def create_recipe():
         i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
     
     if form.validate_on_submit():
+        # check for existing recipe with name
+
         # update recipe model
         recipe_orm = Recipe()
-        return [dir(recipe_orm), form.data]
-        # form.populate_obj(recipe_orm)
+        recipe_orm.name = form.name.data
 
-        # # TEMP UPDATE
-        # recipe_orm.created_by = 'kishan'
+        # TEMP UPDATE
+        recipe_orm.created_by = 'kishan'
         
-        # # return recipe_orm
-        # db.session.add(recipe_orm)
+        db.session.add(recipe_orm)
+        # get new recipe_id? 
 
-        # # update ingredient model
+        # update ingredient model
 
-        # # update direction model
+        # update direction model
 
-        # db.session.commit()
+        db.session.commit()
 
 
-        # return redirect(url_for('home'))
+        return redirect(url_for('home'))
     
     if request.method == 'POST' and form.errors:
         
