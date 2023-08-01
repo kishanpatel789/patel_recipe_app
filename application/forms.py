@@ -103,10 +103,10 @@ class IngredientForm(BaseFormUnsecure):
         'Id',
     )
     recipe_id = IntegerField(
-        'Id',
+        'Recipe Id',
     )
     order_id = IntegerField(
-        'Id',
+        'Order Id',
     )
     quantity = FloatField(
         'Quantity',
@@ -124,6 +124,26 @@ class IngredientForm(BaseFormUnsecure):
         ],
     )
 
+class DirectionForm(BaseFormUnsecure):
+    "Direction line item form"
+
+    id = IntegerField(
+        'Id',
+    )
+    recipe_id = IntegerField(
+        'Recipe Id',
+    )
+    order_id = IntegerField(
+        'OrderId',
+    )
+    description_ = StringField(
+        'Description',
+        validators=[
+            InputRequired(),
+            Length(min=1, max=500)
+        ],
+    )
+
 class RecipeForm(BaseForm):
     """Recipe form"""
 
@@ -134,9 +154,10 @@ class RecipeForm(BaseForm):
         'Recipe Name',
         validators=[
             InputRequired(),
-            Length(min=1, max=20)
+            Length(min=1, max=50)
         ],
     )
     ingredients = FieldList(FormField(IngredientForm), min_entries=1)
+    directions = FieldList(FormField(DirectionForm), min_entries=1)
 
     submit = SubmitField('Submit')

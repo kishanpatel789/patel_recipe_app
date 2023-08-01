@@ -98,13 +98,12 @@ def create_recipe():
             return redirect(url_for('home'))
     
     if request.method == 'POST' and form.errors:
-        
-
         return form.errors
         # for field, errors in form.errors.items():
         #         for error in errors:
         #             flash(f"{field}: {error}", "error")
 
+    # return str(len(form.directions))
     return render_template(
         'create_recipe.html',
         form=form
