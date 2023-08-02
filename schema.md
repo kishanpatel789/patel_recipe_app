@@ -33,15 +33,23 @@
 
 - Unique by both recipe_id and tag_id
 
+## Direction
+| col         | type | nullable | unique | ref        |
+| ----------- | ---- | :------: | :----: | ---------- |
+| id          | int  |          |   1    |            |
+| recipe_id   | int  |          |        | Recipe(id) |
+| order_id    | int  |          |        |            |
+| description | str  |          |        |            |
+
 ## Ingredient
-| col       | type  | nullable | unique | ref        |
-| --------- | ----- | :------: | :----: | ---------- |
-| id        | int   |          |   1    |            |
-| recipe_id | int   |          |        | Recipe(id) |
-| order_id  | int   |          |        |            |
-| quantity  | float |    1     |        |            |
-| unit_id   | int   |    1     |        | Unit(id)   |
-| item      | str   |          |        |            |
+| col          | type  | nullable | unique | ref        |
+| ------------ | ----- | :------: | :----: | ---------- |
+| id           | int   |          |   1    |            |
+| direction_id | int   |          |        | Recipe(id) |
+| order_id     | int   |          |        |            |
+| quantity     | float |    1     |        |            |
+| unit_id      | int   |    1     |        | Unit(id)   |
+| item         | str   |          |        |            |
 
 ## Unit
 | col           | type | nullable | unique | ref |
@@ -52,13 +60,7 @@
 | abbr_singular | str  |    1     |        |     |
 | abbr_plural   | str  |    1     |        |     |
 
-## Direction
-| col         | type | nullable | unique | ref        |
-| ----------- | ---- | :------: | :----: | ---------- |
-| id          | int  |          |   1    |            |
-| recipe_id   | int  |          |        | Recipe(id) |
-| order_id    | int  |          |        |            |
-| description | str  |          |        |            |
+
 
 ## ComplementaryDish
 | col            | type | nullable | unique | ref        |

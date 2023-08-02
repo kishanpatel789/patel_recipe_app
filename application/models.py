@@ -78,10 +78,26 @@ class Unit(db.Model):
     def __repr__(self):
         return f"<Unit {self.id} {self.name}>"
 
+class Direction(db.Model):
+    __tablename__ = "direction"
+    id = db.Column(db.Integer, primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"),
+                          nullable=False)
+    order_id = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String, nullable=False)
+
+    ingredients = db.relationship(
+        "Ingredient",
+        lazy="joined",
+    )
+
+    def __repr__(self):
+        return f"<Direction {self.recipe_id} {self.order_id}>"
+
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
     id = db.Column(db.Integer, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"),
+    direction_id = db.Column(db.Integer, db.ForeignKey("direction.id"),
                           nullable=False)
     order_id = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Float)
@@ -95,14 +111,3 @@ class Ingredient(db.Model):
 
     def __repr__(self):
         return f"<Ingredient {self.item}>"
-
-class Direction(db.Model):
-    __tablename__ = "direction"
-    id = db.Column(db.Integer, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"),
-                          nullable=False)
-    order_id = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String, nullable=False)
-
-    def __repr__(self):
-        return f"<Direction {self.recipe_id} {self.order_id}>"

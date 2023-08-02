@@ -22,8 +22,12 @@ with app.app_context():
     # t1 = db.session.add(new_tag)
     # t2 = db.session.commit()
 
-    units = db.session.execute(
-            db.select(Unit).order_by(Unit.name)
-        ).scalars().all()
+    # units = db.session.execute(
+    #         db.select(Unit).order_by(Unit.name)
+    #     ).scalars().all()
+    
+    directions = db.session.execute(
+        db.select(Direction).where(Direction.recipe_id==2)
+    ).scalars().unique().all()
 
 # %%

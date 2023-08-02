@@ -6,48 +6,76 @@
 
   <h1>{{recipe.name}}</h1>
 
-  <div id="ingredients">
-    <h2>Ingredients</h2>
-    <div class="row row-cols-1 row-cols-sm-2">
-      {% for item in ingredients %}
-      <div class="col">  
-        <label>
-          <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
-          <span>
-            {{ item.item }}
-            {% if item.quantity %}
-              -  
-              {{ item.quantity | format_number }} 
-              {% if item.quantity != 1 %}
-                {% if item.unit.abbr_plural %}
-                  {{ item.unit.abbr_plural }}
-                {% else %}
-                  {{ item.unit.name_plural }}
-                {% endif %}
-              {% else %}
-                {% if item.unit.abbr_singular %}
-                  {{ item.unit.abbr_singular }}
-                {% else %}
-                  {{ item.unit.name }}
-                {% endif %}
-              {% endif %}
-            {% endif %}
-          </span>
-        </label>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-
   <div id="directions">
     <h2>Directions</h2>
     <ol>
-      {% for item in directions %}
+      {% for direction in directions %}
         <span class="step">
-        <li>{{item.description}}</li>
+        <li>{{direction.description}}</li>
+        {% if direction.ingredients %}
+          <ul>
+            {% for item in direction.ingredients %}
+            <li>
+              {{ item.item }}
+              {% if item.quantity %}
+                -  
+                {{ item.quantity | format_number }} 
+                {% if item.quantity != 1 %}
+                  {% if item.unit.abbr_plural %}
+                    {{ item.unit.abbr_plural }}
+                  {% else %}
+                    {{ item.unit.name_plural }}
+                  {% endif %}
+                {% else %}
+                  {% if item.unit.abbr_singular %}
+                    {{ item.unit.abbr_singular }}
+                  {% else %}
+                    {{ item.unit.name }}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            </li>
+        {% endfor %}
+          </ul>
+        {% endif %}
         </span>
       {% endfor %}
     </ol>
+  </div>
+
+  <div id="ingredients">
+    <h2>Ingredients</h2>
+    <div class="row row-cols-1 row-cols-sm-2">
+      {% for direction in directions %}
+        {% for item in direction.ingredients %}
+        <div class="col">  
+          <label>
+            <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
+            <span>
+              {{ item.item }}
+              {% if item.quantity %}
+                -  
+                {{ item.quantity | format_number }} 
+                {% if item.quantity != 1 %}
+                  {% if item.unit.abbr_plural %}
+                    {{ item.unit.abbr_plural }}
+                  {% else %}
+                    {{ item.unit.name_plural }}
+                  {% endif %}
+                {% else %}
+                  {% if item.unit.abbr_singular %}
+                    {{ item.unit.abbr_singular }}
+                  {% else %}
+                    {{ item.unit.name }}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            </span>
+          </label>
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
   </div>
 
   {% if recipe.complementary_dishes %}

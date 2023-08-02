@@ -30,9 +30,9 @@ def show_recipe(recipe_id):
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().unique().one_or_none()
 
-    ingredients = db.session.execute(
-        db.select(Ingredient).where(Ingredient.recipe_id==recipe_id)
-    ).scalars().unique().all()
+    # ingredients = db.session.execute(
+    #     db.select(Ingredient).where(Ingredient.recipe_id==recipe_id)
+    # ).scalars().unique().all()
 
     directions = db.session.execute(
         db.select(Direction).where(Direction.recipe_id==recipe_id)
@@ -42,7 +42,7 @@ def show_recipe(recipe_id):
         return render_template(
             'recipe.html', 
             recipe=recipe, 
-            ingredients=ingredients, 
+            # ingredients=ingredients, 
             directions=directions,
         )
     else:
