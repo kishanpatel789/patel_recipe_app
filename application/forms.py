@@ -143,6 +143,8 @@ class DirectionForm(BaseFormUnsecure):
             Length(min=1, max=500)
         ],
     )
+    ingredients = FieldList(FormField(IngredientForm), min_entries=0)
+
 
 class RecipeForm(BaseForm):
     """Recipe form"""
@@ -157,7 +159,6 @@ class RecipeForm(BaseForm):
             Length(min=1, max=50)
         ],
     )
-    ingredients = FieldList(FormField(IngredientForm), min_entries=1)
     directions = FieldList(FormField(DirectionForm), min_entries=1)
 
     submit = SubmitField('Submit')
