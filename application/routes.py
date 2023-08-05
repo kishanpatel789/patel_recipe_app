@@ -4,7 +4,7 @@ from flask import current_app as app
 import json
 
 from .models import db, Recipe, Ingredient, Direction, Tag, Unit
-from .forms import TagForm, UnitForm, RecipeForm
+from .forms import TagForm, UnitForm, RecipeForm, IngredientForm
 
 # register custom jinja filters
 def format_number(value):
@@ -52,6 +52,7 @@ def show_recipe(recipe_id):
 def create_recipe():
 
     form = RecipeForm()
+    form_ingredient_template = IngredientForm()
 
     # generate at least one ingredient for the first direction
     if request.method == 'GET':
@@ -65,6 +66,8 @@ def create_recipe():
         if d.ingredients:
             for i in d.ingredients:
                 i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+
+    form_ingredient_template.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
     
     
 
@@ -115,7 +118,8 @@ def create_recipe():
         return form.data
     return render_template(
         'create_recipe.html',
-        form=form
+        form=form,
+        form_ingredient_template=form_ingredient_template,
     )
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET', 'POST'])
