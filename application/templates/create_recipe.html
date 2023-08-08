@@ -82,28 +82,38 @@
 
         // Add ingredient line when "Add Ingredient" button is clicked
         $(".add-ingredient-button").click(function() {
-            if (ingredientCount < maxIngredients) {
-                // Clone the first ingredient line; update ID and name attribute
-                var newIngredient = $("#ingredient-container .row").first().clone();
-                newIngredient.find("input, select").each(function() {
-                    var oldId = $(this).attr("id");
-                    var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
-                    $(this).attr("id", newId);
+            // if (ingredientCount < maxIngredients) {
+            //     // Clone the first ingredient line; update ID and name attribute
+            //     var newIngredient = $("#ingredient-container .row").first().clone();
+            //     newIngredient.find("input, select").each(function() {
+            //         var oldId = $(this).attr("id");
+            //         var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
+            //         $(this).attr("id", newId);
 
-                    var oldName = $(this).attr("name");
-                    var newName = oldName.replace("-0-", "-" + ingredientCount + "-");
-                    $(this).attr("name", newName);
-                });
+            //         var oldName = $(this).attr("name");
+            //         var newName = oldName.replace("-0-", "-" + ingredientCount + "-");
+            //         $(this).attr("name", newName);
+            //     });
+            //     newIngredient.find("input").val("");
+            //     newIngredient.find("select").val("-1");
 
-                // Clear the values in the cloned inputs
-                newIngredient.find("input").val("");
-                newIngredient.find("select").val("-1");
+            //     // Append the new ingredient line to the container
+            //     $("#ingredient-container").append(newIngredient);
 
-                // Append the new ingredient line to the container
-                $("#ingredient-container").append(newIngredient);
+            //     ingredientCount++;
+            // }
 
-                ingredientCount++;
-            }
+            // identify direction item
+            var directionNum = $(this).attr("id").split("-").pop()
+
+            // clone template
+            var newIngredient = $("#ingredient-template").clone()
+
+            // update values
+            newIngredient.attr("id", "")
+
+            // append
+            $("")
         });
 
         // Remove latest ingredient line when "Remove Latest Ingredient" button is clicked
