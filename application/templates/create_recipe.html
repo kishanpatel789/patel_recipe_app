@@ -22,29 +22,33 @@
         <div id="direction-container">
             <ol>
                 {% for direction_field in form.directions %}
-                <div class="row mb-2">
-                    <div class="col">
-                        <li>
-                            {{ direction_field.description_(class_='form-control', placeholder='description') }}
-                            <button type="button" id="remove-ingredient-0" class="btn btn-danger remove-ingredient-button">-</button>
-                            <button type="button" id="add-ingredient-0" class="btn btn-primary add-ingredient-button">+</button>
-                        </li>
+                <div id="direction-box-{{loop.index0}}">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <li>
+                                {{ direction_field.description_(class_='form-control', placeholder='description') }}
+                                <button type="button" id="remove-ingredient-0" class="btn btn-danger remove-ingredient-button">-</button>
+                                <button type="button" id="add-ingredient-0" class="btn btn-primary add-ingredient-button">+</button>
+                            </li>
+                        </div>
+                    </div>
+                    <div id="ingredient-box-{{loop.index0}}">
+                        {% for ingredient_field in direction_field.ingredients %}
+                        <div id="ingredient-item-{{loop.index0}}" class="row g-3 mb-2">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-6">
+                                {{ ingredient_field.item(class_='form-control', placeholder='item') }}
+                            </div>
+                            <div class="col-sm">
+                                {{ ingredient_field.quantity(class_='form-control', placeholder='quantity') }}
+                            </div>
+                            <div class="col-sm">
+                                {{ ingredient_field.unit_id(class_='form-select', placeholder='unit') }}
+                            </div>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                    {% for ingredient_field in direction_field.ingredients %}
-                    <div class="row g-3 mb-2">
-                        <div class="col-sm-1"></div>
-                        <div class="col-sm-6">
-                            {{ ingredient_field.item(class_='form-control', placeholder='item') }}
-                        </div>
-                        <div class="col-sm">
-                            {{ ingredient_field.quantity(class_='form-control', placeholder='quantity') }}
-                        </div>
-                        <div class="col-sm">
-                            {{ ingredient_field.unit_id(class_='form-select', placeholder='unit') }}
-                        </div>
-                    </div>
-                    {% endfor %}
                 {% endfor %}
             </ol>
             <button type="button" id="remove-direction" class="btn btn-danger mt-3">-</button>
@@ -55,7 +59,7 @@
         {{ form.submit(class="btn btn-primary") }}
     </form>
 
-    <div id="ingredient-template" class="row g-3 mb-2">
+    <div id="ingredient-template" class="ingredient-item row g-3 mb-2">
         <div class="col-sm-1"></div>
         <div class="col-sm-6">
             {{ form_ingredient_template.item(class_='form-control', placeholder='item') }}
@@ -133,9 +137,16 @@
         // Add direction line when "Add Direction" button is clicked
         $("#add-direction").click(function() {
             if (directionCount < maxDirections) {
-                // Clone the first direction line; update ID and name attribute
-                var newDirection = $("#direction-container .row").first().clone();
-                newDirection.find("input").each(function() {
+                // Clone the first direction box; update ID of box 
+                var newDirectionBox = $("#direction-container [id^='direction-box-']").first().clone(); 
+                newDirectionBox.attr("id", "direction-box-" + directionCount);
+
+                // Update ID of embedded ingredient box and clear its contents
+                var newIngredientBox = newDirectionBox.find("[id^='ingredient-box-']")
+                newIngredientBox.attr("id", "ingredient-box-" + directionCount).empty();
+
+                // Update names and ids of direction description input
+                newDirectionBox.find("input").each(function() {
                     var oldId = $(this).attr("id");
                     var newId = oldId.replace("-0-", "-" + directionCount + "-");
                     $(this).attr("id", newId);
@@ -146,10 +157,10 @@
                 });
 
                 // Clear the values in the cloned inputs
-                newDirection.find("input").val("");
+                newDirectionBox.find("input").val("");
 
                 // Append the new ingredient line to the container
-                $("#direction-container ol").append(newDirection);
+                $("#direction-container ol").append(newDirectionBox);
 
                 directionCount++;
             }
@@ -158,7 +169,7 @@
         // Remove latest direction line when "Remove Latest Direction" button is clicked
         $("#remove-direction").click(function() {
             if (directionCount > 1) {
-                $("#direction-container .row").last().remove();
+                $("#direction-container [id^='direction-box-']").last().remove();
                 directionCount--;
             }
         });
