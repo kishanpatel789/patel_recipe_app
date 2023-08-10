@@ -27,8 +27,8 @@
                         <div class="col">
                             <li>
                                 {{ direction_field.description_(class_='form-control', placeholder='description') }}
-                                <button type="button" id="remove-ingredient-0" class="btn btn-danger remove-ingredient-button">-</button>
-                                <button type="button" id="add-ingredient-0" class="btn btn-primary add-ingredient-button">+</button>
+                                <button type="button" id="remove-ingredient-{{loop.index0}}" class="btn btn-danger remove-ingredient-button">-</button>
+                                <button type="button" id="add-ingredient-{{loop.index0}}" class="btn btn-primary add-ingredient-button">+</button>
                             </li>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
         {{ form.submit(class="btn btn-primary") }}
     </form>
 
-    <div id="ingredient-template" class="ingredient-item row g-3 mb-2">
+    <div id="ingredient-template" class="row g-3 mb-2">
         <div class="col-sm-1"></div>
         <div class="col-sm-6">
             {{ form_ingredient_template.item(class_='form-control', placeholder='item') }}
@@ -78,6 +78,11 @@
 {{super()}}
 <script>
     $(document).ready(function() {
+
+        /*
+        ADD/REMOVE INGREDIENT LINES
+        */
+
         // Keep track of the ingredient line count
         var ingredientCount = 1;
 
@@ -128,6 +133,10 @@
             }
         });
 
+        /*
+        ADD/REMOVE DIRECTION LINES
+        */
+
         // Keep track of the direction line count
         var directionCount = 1;
 
@@ -158,6 +167,13 @@
 
                 // Clear the values in the cloned inputs
                 newDirectionBox.find("input").val("");
+
+                // Update ids of ingredient add/remove buttons
+                newDirectionBox.find("button").each(function() {
+                    var oldId = $(this).attr("id");
+                    var newId = oldId.replace("-0", "-" + directionCount);
+                    $(this).attr("id", newId);
+                });
 
                 // Append the new ingredient line to the container
                 $("#direction-container ol").append(newDirectionBox);
