@@ -48,7 +48,7 @@ def show_recipe(recipe_id):
     else:
         abort(404)
 
-@app.route('/recipe/new/', methods=['GET', 'POST'])
+@app.route('/recipe/new', methods=['GET', 'POST'])
 def create_recipe():
 
     form = RecipeForm()
@@ -132,7 +132,7 @@ def edit_recipe(recipe_id):
     
 
 # tag
-@app.route('/tag/', methods=['GET'])
+@app.route('/tag', methods=['GET'])
 def show_tags():
     # query database
     tags = db.session.execute(
@@ -148,7 +148,7 @@ def show_tags():
         form=form,
     )
 
-@app.route('/tag/new/', methods=['POST'])
+@app.route('/tag/new', methods=['POST'])
 def create_tag():
     form = TagForm()
 
@@ -210,7 +210,7 @@ def delete_tag(tag_id):
     return redirect(url_for("show_tags"))
 
 # unit
-@app.route('/unit/', methods=['GET'])
+@app.route('/unit', methods=['GET'])
 def show_units():
     # query database
     units = db.session.execute(
@@ -226,7 +226,7 @@ def show_units():
         default='',
     )
 
-@app.route('/unit/new/', methods=['POST'])
+@app.route('/unit/new', methods=['POST'])
 def create_unit():
     form = UnitForm()
 
