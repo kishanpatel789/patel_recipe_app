@@ -27,8 +27,8 @@
                         <div class="col">
                             <li>
                                 {{ direction_field.description_(class_='form-control', placeholder='description') }}
-                                <button type="button" id="remove-ingredient-{{loop.index0}}" class="btn btn-danger remove-ingredient-button">-</button>
-                                <button type="button" id="add-ingredient-{{loop.index0}}" class="btn btn-primary add-ingredient-button">+</button>
+                                <button type="button" data-direction-id="{{loop.index0}}" class="btn btn-danger remove-ingredient-button">-</button>
+                                <button type="button" data-direction-id="{{loop.index0}}" class="btn btn-primary add-ingredient-button">+</button>
                             </li>
                         </div>
                     </div>
@@ -82,6 +82,7 @@
         /*
         ADD/REMOVE INGREDIENT LINES
         */
+        var ingredientCounts = [];
 
         // Keep track of the ingredient line count
         var ingredientCount = 1;
@@ -112,17 +113,27 @@
             //     ingredientCount++;
             // }
 
-            // identify direction item
-            var directionNum = $(this).attr("id").split("-").pop()
+            // identify direction item from clicked button
+            // var directionId = $(this).attr("id").split("-").pop()
+            var directionId = $(this).data("direction-id");
+
+
+            // update ingredientCounts
+            // if directionId is initialized, add 1; otherwise push 1
+            if (directionId <= ingredientCounts.length-1) {
+                ingredientCounts[directionId]++;
+            } else {
+                ingredientCounts.push(1);
+            }
 
             // clone template
-            var newIngredient = $("#ingredient-template").clone()
+            var newIngredient = $("#ingredient-template").clone();
 
             // update values
-            newIngredient.attr("id", "")
+            // newIngredient.attr("id", "ingredient-item-" + );
 
             // append
-            $("")
+            $("#ingredient-box-" + directionId).append(newIngredient);
         });
 
         // Remove latest ingredient line when "Remove Latest Ingredient" button is clicked
