@@ -116,11 +116,28 @@
 
             //     ingredientCount++;
             // }
-
+            console.log('in add ingredient button')
             // identify direction item from clicked button
             // var directionId = $(this).attr("id").split("-").pop()
             var directionId = $(this).data("direction-id");
 
+            // clone template
+            var newIngredient = $("#ingredient-template").clone();
+
+            // update values
+            newIngredient.attr("id", "ingredient-item-" + ingredientCounts[directionId]);
+            newIngredient.find("input, select").each(function() {
+                var templateId = $(this).attr("id")
+                var newId = "directions-" + directionId + "-ingredients-" + ingredientCounts[directionId] + "-" + templateId
+                $(this).attr("id", newId)
+
+                var templateName = $(this).attr("name")
+                var newName = "directions-" + directionId + "-ingredients-" + ingredientCounts[directionId] + "-" + templateName
+                $(this).attr("name", newName)
+            })
+
+            // append
+            $("#ingredient-box-" + directionId).append(newIngredient);
 
             // update ingredientCounts
             // if directionId is initialized, add 1; otherwise push 1
@@ -130,24 +147,21 @@
                 ingredientCounts.push(1);
             }
 
-            // clone template
-            var newIngredient = $("#ingredient-template").clone();
-
-            // update values
-            // newIngredient.attr("id", "ingredient-item-" + );
-
-            // append
-            $("#ingredient-box-" + directionId).append(newIngredient);
-
             console.log(ingredientCounts);
         });
 
         // Remove latest ingredient line when "Remove Latest Ingredient" button is clicked
-        $("#remove-ingredient").click(function() {
-            if (ingredientCount > 1) {
-                $("#ingredient-container .row").last().remove();
-                ingredientCount--;
+        $(".remove-ingredient-button").click(function() {
+            // identify direction item from clicked button
+            var directionId = $(this).data("direction-id");
+
+            if (ingredientCounts[directionId] > 1) {
+                // remove last ingredient
+                $("#ingredient-box-" + directionId).find("[id^=ingredient-item-]").last().remove();
+                ingredientCounts[directionId]--;
             }
+
+            console.log(ingredientCounts);
         });
 
         /*
@@ -196,8 +210,12 @@
                 // Append the new ingredient line to the container
                 $("#direction-container ol").append(newDirectionBox);
 
+                // update direction count and ingredient count array
                 directionCount++;
+                ingredientCounts.push(0);
             }
+
+            console.log(ingredientCounts);
         });
 
         // Remove latest direction line when "Remove Latest Direction" button is clicked
@@ -205,7 +223,9 @@
             if (directionCount > 1) {
                 $("#direction-container [id^='direction-box-']").last().remove();
                 directionCount--;
+                ingredientCounts.pop();
             }
+            console.log(ingredientCounts);
         });
     });
 </script>
