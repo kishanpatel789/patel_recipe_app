@@ -94,30 +94,7 @@
         // Maximum number of ingredient lines allowed (change as needed)
         var maxIngredients = 20;
 
-        // Add ingredient line when "Add Ingredient" button is clicked
-        $(".add-ingredient-button").click(function() {
-            // if (ingredientCount < maxIngredients) {
-            //     // Clone the first ingredient line; update ID and name attribute
-            //     var newIngredient = $("#ingredient-container .row").first().clone();
-            //     newIngredient.find("input, select").each(function() {
-            //         var oldId = $(this).attr("id");
-            //         var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
-            //         $(this).attr("id", newId);
-
-            //         var oldName = $(this).attr("name");
-            //         var newName = oldName.replace("-0-", "-" + ingredientCount + "-");
-            //         $(this).attr("name", newName);
-            //     });
-            //     newIngredient.find("input").val("");
-            //     newIngredient.find("select").val("-1");
-
-            //     // Append the new ingredient line to the container
-            //     $("#ingredient-container").append(newIngredient);
-
-            //     ingredientCount++;
-            // }
-            console.log('in add ingredient button')
-            // identify direction item from clicked button
+        function addIngredientClickHandler() {
             // var directionId = $(this).attr("id").split("-").pop()
             var directionId = $(this).data("direction-id");
 
@@ -148,7 +125,66 @@
             }
 
             console.log(ingredientCounts);
-        });
+        }
+
+        // Add ingredient line when "Add Ingredient" button is clicked
+        $(".add-ingredient-button").click(
+            addIngredientClickHandler
+            // function() {
+            // if (ingredientCount < maxIngredients) {
+            //     // Clone the first ingredient line; update ID and name attribute
+            //     var newIngredient = $("#ingredient-container .row").first().clone();
+            //     newIngredient.find("input, select").each(function() {
+            //         var oldId = $(this).attr("id");
+            //         var newId = oldId.replace("-0-", "-" + ingredientCount + "-");
+            //         $(this).attr("id", newId);
+
+            //         var oldName = $(this).attr("name");
+            //         var newName = oldName.replace("-0-", "-" + ingredientCount + "-");
+            //         $(this).attr("name", newName);
+            //     });
+            //     newIngredient.find("input").val("");
+            //     newIngredient.find("select").val("-1");
+
+            //     // Append the new ingredient line to the container
+            //     $("#ingredient-container").append(newIngredient);
+
+            //     ingredientCount++;
+            // }
+
+            // // identify direction item from clicked button
+            // // var directionId = $(this).attr("id").split("-").pop()
+            // var directionId = $(this).data("direction-id");
+
+            // // clone template
+            // var newIngredient = $("#ingredient-template").clone();
+
+            // // update values
+            // newIngredient.attr("id", "ingredient-item-" + ingredientCounts[directionId]);
+            // newIngredient.find("input, select").each(function() {
+            //     var templateId = $(this).attr("id")
+            //     var newId = "directions-" + directionId + "-ingredients-" + ingredientCounts[directionId] + "-" + templateId
+            //     $(this).attr("id", newId)
+
+            //     var templateName = $(this).attr("name")
+            //     var newName = "directions-" + directionId + "-ingredients-" + ingredientCounts[directionId] + "-" + templateName
+            //     $(this).attr("name", newName)
+            // })
+
+            // // append
+            // $("#ingredient-box-" + directionId).append(newIngredient);
+
+            // // update ingredientCounts
+            // // if directionId is initialized, add 1; otherwise push 1
+            // if (directionId <= ingredientCounts.length-1) {
+            //     ingredientCounts[directionId]++;
+            // } else {
+            //     ingredientCounts.push(1);
+            // }
+
+            // console.log(ingredientCounts);
+        // }
+        );
 
         // Remove latest ingredient line when "Remove Latest Ingredient" button is clicked
         $(".remove-ingredient-button").click(function() {
@@ -213,6 +249,9 @@
                 // update direction count and ingredient count array
                 directionCount++;
                 ingredientCounts.push(0);
+
+                // reapply click handler for add ingredient buttons
+                $(".add-ingredient-button").click(addIngredientClickHandler);
             }
 
             console.log(ingredientCounts);
