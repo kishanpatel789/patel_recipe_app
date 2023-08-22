@@ -128,7 +128,7 @@
         }
 
         // Add ingredient line when "Add Ingredient" button is clicked
-        $(".add-ingredient-button").click(
+        $(".add-ingredient-button").off("click").click(
             addIngredientClickHandler
             // function() {
             // if (ingredientCount < maxIngredients) {
@@ -251,7 +251,7 @@
                 ingredientCounts.push(0);
 
                 // reapply click handler for add ingredient buttons
-                $(".add-ingredient-button").click(addIngredientClickHandler);
+                $(".add-ingredient-button").off("click").click(addIngredientClickHandler);
             }
 
             console.log(ingredientCounts);
