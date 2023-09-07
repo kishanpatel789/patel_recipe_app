@@ -31,10 +31,15 @@ class Recipe(db.Model):
     )
     modified_by = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+    directions = db.relationship(
+        "Direction",
+        lazy="select",
+    )
+
     tags = db.relationship(
        "Tag", 
        secondary=recipe_tag, 
-       lazy="joined",
+       lazy="select",
     )
 
     complementary_dishes = db.relationship(
@@ -81,8 +86,11 @@ class Unit(db.Model):
 class Direction(db.Model):
     __tablename__ = "direction"
     id = db.Column(db.Integer, primary_key=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"),
-                          nullable=False)
+    recipe_id = db.Column(
+        db.Integer, 
+        db.ForeignKey("recipe.id"),
+        nullable=False,
+    )
     order_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String, nullable=False)
 

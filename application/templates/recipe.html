@@ -9,7 +9,7 @@
   <div id="directions">
     <h2>Directions</h2>
     <ol>
-      {% for direction in directions %}
+      {% for direction in recipe.directions %}
         <span class="step">
         <li>{{direction.description}}</li>
         {% if direction.ingredients %}
@@ -46,7 +46,7 @@
   <div id="ingredients">
     <h2>Ingredients</h2>
     <div class="row row-cols-1 row-cols-sm-2">
-      {% for direction in directions %}
+      {% for direction in recipe.directions %}
         {% for item in direction.ingredients %}
         <div class="col">  
           <label>
