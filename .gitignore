@@ -5,3 +5,4 @@ recipe.db
 seed_data/
 *.png
 .env
+pg_data
