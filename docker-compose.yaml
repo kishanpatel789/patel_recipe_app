@@ -4,8 +4,8 @@ services:
     environment: 
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=ny_taxi
-    volumnes:
+      - POSTGRES_DB=prod
+    volumes:
       - "./pg_data:/var/lib/postgresql/data:rw"
     ports:
       - "5432:5432"

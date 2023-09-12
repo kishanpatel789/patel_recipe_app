@@ -155,6 +155,8 @@ with app.app_context():
 
         for mod_inst in mod_inst_items:
             db.session.add(mod_inst)
+    
+    db.session.commit()
 
     # association tables
     for mapper in seed_map_assoc:
