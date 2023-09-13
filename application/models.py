@@ -34,6 +34,7 @@ class Recipe(db.Model):
     directions = db.relationship(
         "Direction",
         lazy="select",
+        order_by="Direction.order_id",
     )
 
     tags = db.relationship(
@@ -97,6 +98,7 @@ class Direction(db.Model):
     ingredients = db.relationship(
         "Ingredient",
         lazy="joined",
+        order_by="Ingredient.order_id"
     )
 
     def __repr__(self):
