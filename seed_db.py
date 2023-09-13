@@ -146,6 +146,8 @@ with app.app_context():
                 print(row)
                 mod_inst = mapper['cls']()
                 for key, value in row.items():
+                    if key == 'id':  # let postgres handle the id creation
+                        continue
                     if value == '':  # overwrite empty value with None (null)
                         value = None
                     if key in mapper['dt_cols'] and value != None:

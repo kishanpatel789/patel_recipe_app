@@ -89,7 +89,7 @@ def create_recipe():
                     # update recipe model
                     recipe_orm = Recipe(
                         name=form.name.data,
-                        created_by = 'kishan'  # TEMP UPDATE; re-do later with logged in user
+                        created_by = 1  # TEMP UPDATE with kishan; re-do later with logged in user
                     )
                     db.session.add(recipe_orm)
                     db.session.flush()
