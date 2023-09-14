@@ -120,7 +120,7 @@ class IngredientForm(BaseFormUnsecure):
         'Item',
         validators=[
             InputRequired(),
-            Length(min=1, max=20)
+            Length(min=1, max=50)
         ],
     )
 

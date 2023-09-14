@@ -93,7 +93,7 @@ class Direction(db.Model):
         nullable=False,
     )
     order_id = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String, nullable=False)
+    description_ = db.Column(db.String, nullable=False)
 
     ingredients = db.relationship(
         "Ingredient",
