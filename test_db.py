@@ -8,9 +8,9 @@ app = create_app()
 
 # %%
 with app.app_context():
-    rep = db.session.execute(
-        db.select(Recipe).where(Recipe.id==1)
-    ).scalars().unique().one_or_none()
+    # rep = db.session.execute(
+    #     db.select(Recipe).where(Recipe.id==1)
+    # ).scalars().unique().one_or_none()
 
     # comp = rep.complementary_dishes.all()
 
@@ -29,5 +29,12 @@ with app.app_context():
     # directions = db.session.execute(
     #     db.select(Direction).where(Direction.recipe_id==2)
     # ).scalars().unique().all()
+
+    direction = db.session.execute(
+        db.select(Direction).where(Direction.id==13)
+    ).scalars().unique().one_or_none()
+    db.session.delete(direction)
+
+    db.session.commit()
 
 # %%
