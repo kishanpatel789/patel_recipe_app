@@ -115,16 +115,11 @@ def create_recipe():
                             )
                             db.session.add(ingredient_orm)
 
+                return redirect(url_for('home'))
+            
             except Exception as e:
                 flash(f"An error occurred: {e}")
-                return render_template(
-                    'create_recipe.html',
-                    form=form,
-                    form_ingredient_template=form_ingredient_template,
-                )
-
-        return redirect(url_for('home'))
-    
+                
     if request.method == 'POST' and form.errors:
         for field, errors in form.errors.items():
                 for error in errors:
@@ -147,52 +142,66 @@ def edit_recipe(recipe_id):
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().one_or_none()
 
+    # populate form with submitted form info or with existing info
+    form = RecipeForm(obj=existing_recipe)
+
+    # dynamically determine unit options
+    units = db.session.execute(
+        db.select(Unit).order_by(Unit.name)
+    ).scalars().all()
+    for d in form.directions:
+        if d.ingredients:
+            for i in d.ingredients:
+                i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+
     if not existing_recipe:
         flash(f"Recipe with ID '{recipe_id}' does not exist and cannot be edited", "error")
         return redirect(url_for('home'))
     else:
-        # populate form with submitted form info or with existing info
-        form = RecipeForm(obj=existing_recipe)
+        # persist form content 
+        if form.validate_on_submit():
+            try: 
+                db.session.close()  # close session to handle transactional-level management
+                with db.session.begin():
+                    # update recipe model
+                    existing_recipe.name = form.name.data
+                    existing_recipe.modified_by = 2
 
-        # dynamically determine unit options
-        units = db.session.execute(
-            db.select(Unit).order_by(Unit.name)
-        ).scalars().all()
-        for d in form.directions:
-            if d.ingredients:
-                for i in d.ingredients:
-                    i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
+                    # update direction model - create, update, delete
+                    existing_direction_cnt = len(existing_recipe.directions)
+                    new_direction_cnt = len(form.directions)
 
+                    new_directions = []
+                    for form_direction_index, form_direction in enumerate(form.directions):
+                        if form_direction_index < existing_direction_cnt:
+                            # update
+                            existing_direction = existing_recipe.directions[form_direction_index]
+                            existing_direction.description_ = form_direction.description_.data
+                        else:
+                            # create
+                            new_direction = Direction(
+                                recipe_id = recipe_id,                 
+                                order_id = form_direction_index + 1,
+                                description_ = form_direction.description_.data,
+                            )
+                            new_directions.append(new_direction)
+                    db.session.add_all(new_directions)
+
+                    # delete
+                    if new_direction_cnt < existing_direction_cnt:
+                        for i in range(new_direction_cnt, existing_direction_cnt):
+                            db.session.delete(existing_recipe.directions[i])
+
+                    # update ingredient model - create, update, delete
+
+                return redirect(url_for('show_recipe', recipe_id=recipe_id))
+
+            except Exception as e:
+                flash(f"An error occurred: {e}")
+        
         # # TEST POST INPUT
         # if request.method == 'POST':
         #     return form.data
-
-        # persist form content 
-        if form.validate_on_submit():
-            # update recipe model
-            existing_recipe.name = form.name.data
-            existing_recipe.modified_by = 2
-
-            # update direction model - create, update, delete
-            # existing_direction_order_ids = {d.order_id for d in existing_recipe.directions}
-            existing_direction_cnt = len(existing_recipe.directions)
-            new_directions = []
-            for form_direction_index, form_direction in enumerate(form.directions):
-                if form_direction_index < existing_direction_cnt:
-                    # update
-                    existing_direction = existing_recipe.directions[form_direction_index]
-                    existing_direction.description_ = form_direction.description_
-                else:
-                    # create
-                    pass
-
-            # delete
-
-            # update ingredient model - create, update, delete
-
-            # form.populate_obj(existing_recipe)
-            db.session.commit()      
-            return redirect(url_for("home"))
 
         if request.method == 'POST' and form.errors:
             for field, errors in form.errors.items():
@@ -212,78 +221,6 @@ def edit_recipe(recipe_id):
             header='Edit Recipe',
         )
     
-
-
-    # if form.validate_on_submit():
-    #     # check for existing recipe with name
-    #     existing_recipe = db.session.execute(
-    #         db.select(Recipe).where(Recipe.name==form.name.data)
-    #     ).scalars().unique().one_or_none()
-
-    #     if existing_recipe:
-    #         flash(f"Recipe with '{form.name.data}' already exists")
-    #         return render_template(
-    #                 'create_recipe.html',
-    #                 form=form,
-    #                 form_ingredient_template=form_ingredient_template,
-    #             )   
-    #     else:
-    #         try: 
-    #             db.session.close()  # close session to handle transactional-level management
-    #             with db.session.begin():
-    #                 # update recipe model
-    #                 recipe_orm = Recipe(
-    #                     name=form.name.data,
-    #                     created_by = 1  # TEMP UPDATE with kishan; re-do later with logged in user
-    #                 )
-    #                 db.session.add(recipe_orm)
-    #                 db.session.flush()
-
-    #                 # update direction model
-    #                 for i, direction in enumerate(form.directions):
-    #                     direction_orm = Direction(
-    #                         recipe_id = recipe_orm.id,
-    #                         order_id = i+1,
-    #                         description = direction.description_.data,
-    #                     )
-    #                     db.session.add(direction_orm)
-    #                     db.session.flush()
-
-    #                     # update ingredient model
-    #                     for j, ingredient in enumerate(direction.ingredients):
-    #                         ingredient_orm = Ingredient(
-    #                             direction_id = direction_orm.id,
-    #                             order_id = j+1,
-    #                             quantity = ingredient.quantity.data,
-    #                             unit_id = ingredient.unit_id.data,
-    #                             item = ingredient.item.data,
-    #                         )
-    #                         db.session.add(ingredient_orm)
-
-    #         except Exception as e:
-    #             flash(f"An error occurred: {e}")
-    #             return render_template(
-    #                 'create_recipe.html',
-    #                 form=form,
-    #                 form_ingredient_template=form_ingredient_template,
-    #             )
-
-    #     return redirect(url_for('home'))
-    
-    # if request.method == 'POST' and form.errors:
-    #     for field, errors in form.errors.items():
-    #             for error in errors:
-    #                 flash(f"{field}: {error}", "error")
-
-    # # if request.method == 'POST':
-    # #     return form.data
-    # return render_template(
-    #     'create_recipe.html',
-    #     form=form,
-    #     form_ingredient_template=form_ingredient_template,
-    #     header='Edit Recipe',
-    # )
-
 
 # tag
 @app.route('/tag', methods=['GET'])
