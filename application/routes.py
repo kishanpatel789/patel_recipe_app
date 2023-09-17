@@ -163,20 +163,43 @@ def edit_recipe(recipe_id):
                 for i in d.ingredients:
                     i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
 
-        # store form content 
+        # # TEST POST INPUT
+        # if request.method == 'POST':
+        #     return form.data
+
+        # persist form content 
         if form.validate_on_submit():
-            if existing_recipe:
-                form.populate_obj(existing_recipe)
-                db.session.commit()      
-                return redirect(url_for("home"))
+            # update recipe model
+            existing_recipe.name = form.name.data
+            existing_recipe.modified_by = 2
+
+            # update direction model - create, update, delete
+            # existing_direction_order_ids = {d.order_id for d in existing_recipe.directions}
+            existing_direction_cnt = len(existing_recipe.directions)
+            new_directions = []
+            for form_direction_index, form_direction in enumerate(form.directions):
+                if form_direction_index < existing_direction_cnt:
+                    # update
+                    existing_direction = existing_recipe.directions[form_direction_index]
+                    existing_direction.description_ = form_direction.description_
+                else:
+                    # create
+                    pass
+
+            # delete
+
+            # update ingredient model - create, update, delete
+
+            # form.populate_obj(existing_recipe)
+            db.session.commit()      
+            return redirect(url_for("home"))
 
         if request.method == 'POST' and form.errors:
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(f"{field}: {error}", "error")
 
-        if request.method == 'POST':
-            return form.data
+        
 
         # set template form
         form_ingredient_template = IngredientForm()

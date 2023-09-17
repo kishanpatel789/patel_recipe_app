@@ -6,3 +6,4 @@ seed_data/
 *.png
 .env
 pg_data
+scratch.txt
