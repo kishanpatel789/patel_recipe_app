@@ -141,6 +141,7 @@ def edit_recipe(recipe_id):
     existing_recipe = db.session.execute(
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().one_or_none()
+    
 
     # populate form with submitted form info or with existing info
     form = RecipeForm(obj=existing_recipe)
@@ -163,48 +164,77 @@ def edit_recipe(recipe_id):
             try: 
                 db.session.close()  # close session to handle transactional-level management
                 with db.session.begin():
+
                     # update recipe model
                     existing_recipe.name = form.name.data
                     existing_recipe.modified_by = 2
 
                     # update direction model - create, update, delete
-                    existing_direction_cnt = len(existing_recipe.directions)
+                    # get existing directions
+                    existing_directions = db.session.execute(
+                        db.select(Direction).where(Direction.recipe_id==recipe_id).order_by(Direction.order_id)
+                    ).scalars().unique().all()
+                    existing_direction_cnt = len(existing_directions)
                     new_direction_cnt = len(form.directions)
                     new_directions = []
 
                     for form_direction_index, form_direction in enumerate(form.directions):
                         if form_direction_index < existing_direction_cnt:
                             # update direction
-                            existing_direction = existing_recipe.directions[form_direction_index]
+                            # existing_direction = existing_recipe.directions[form_direction_index]
+                            existing_direction = existing_directions[form_direction_index]
                             existing_direction.description_ = form_direction.description_.data
 
-                            existing_ingredient_cnt = len(existing_direction.ingredients)
-                            new_ingredient_cnt = len(form_direction.ingredients)
-                            new_ingredients = []
+                            # existing_ingredient_cnt = len(existing_direction.ingredients)
+                            # new_ingredient_cnt = len(form_direction.ingredients)
+                            # new_ingredients = []
 
-                            for form_ingredient_index, form_ingredient in enumerate(form_direction.ingredients):
-                                if form_ingredient_index < existing_ingredient_cnt:
-                                    # update ingredient for existing direction - SOMETHING'S WRONG HERE
-                                    existing_ingredient = existing_direction.ingredients[form_ingredient_index]
-                                    existing_ingredient.quantity = form_ingredient.quantity.data
-                                    existing_ingredient.unit_id = form_ingredient.unit_id.data
-                                    existing_ingredient.item = form_ingredient.item.data
-                                else:
-                                    # create ingredient for existing direction
-                                    new_ingredient = Ingredient(
-                                        direction_id = existing_direction.id,                 
-                                        order_id = form_ingredient_index + 1,
-                                        quantity = form_ingredient.quantity.data,
-                                        unit_id = form_ingredient.unit_id.data,
-                                        item = form_ingredient.item.data,
-                                    )
-                                    new_ingredients.append(new_ingredient)
-                            db.session.add_all(new_ingredients)
+                            # # print(f"\nWE MADE IT! existing_ingredient_cnt {existing_ingredient_cnt},  new_ingredient_cnt {new_ingredient_cnt} \n")
 
-                            # delete ingredient for existing direction
-                            if new_ingredient_cnt < existing_ingredient_cnt:
-                                for i in range(new_ingredient_cnt, existing_ingredient_cnt):
-                                    db.session.delete(existing_direction.ingredients[i])
+
+                            # for form_ingredient_index, form_ingredient in enumerate(form_direction.ingredients):
+
+                            #     if form_ingredient_index < existing_ingredient_cnt:
+                            #         # update ingredient for existing direction - SOMETHING'S WRONG HERE
+
+
+                            #         print(f"""\nWE MADE IT! 
+                            #           form_ingredient_index {form_ingredient_index}, 
+                            #           form_ingredient.item.data {form_ingredient.item.data},
+                            #           existing_ingredient_cnt {existing_ingredient_cnt},  
+                            #           new_ingredient_cnt {new_ingredient_cnt} \n""")
+
+                            #         existing_ingredient = existing_direction.ingredients[form_ingredient_index]
+
+                            #         print("old item: ", existing_ingredient.item, "new item: ", form_ingredient.item.data)
+                            #         # db.session.expire(existing_ingredient) # throws persistence error
+
+
+                            #         existing_ingredient.quantity = form_ingredient.quantity.data
+                            #         existing_ingredient.unit_id = form_ingredient.unit_id.data
+                            #         existing_ingredient.item = form_ingredient.item.data
+
+                            #         print("orm item after update: ", existing_ingredient.item)
+                            #         # db.session.refresh(existing_ingredient) # throws persistence error
+                            #         # db.session.flush() # doesn't persist but passes without error 
+                            #         # db.session.commit() # nope doesn't like this
+
+                            #     else:
+                            #         # create ingredient for existing direction
+                            #         new_ingredient = Ingredient(
+                            #             direction_id = existing_direction.id,                 
+                            #             order_id = form_ingredient_index + 1,
+                            #             quantity = form_ingredient.quantity.data,
+                            #             unit_id = form_ingredient.unit_id.data,
+                            #             item = form_ingredient.item.data,
+                            #         )
+                            #         new_ingredients.append(new_ingredient)
+                            # db.session.add_all(new_ingredients)
+
+                            # # delete ingredient for existing direction
+                            # if new_ingredient_cnt < existing_ingredient_cnt:
+                            #     for i in range(new_ingredient_cnt, existing_ingredient_cnt):
+                            #         db.session.delete(existing_direction.ingredients[i])
                         else:
                             # create direction
                             new_direction = Direction(
@@ -221,7 +251,7 @@ def edit_recipe(recipe_id):
                     # delete direction
                     if new_direction_cnt < existing_direction_cnt:
                         for i in range(new_direction_cnt, existing_direction_cnt):
-                            db.session.delete(existing_recipe.directions[i])
+                            db.session.delete(existing_directions[i])
 
                     # update ingredient model - create, update, delete
 
