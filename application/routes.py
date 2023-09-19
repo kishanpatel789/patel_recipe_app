@@ -17,7 +17,7 @@ app.jinja_env.filters['format_number'] = format_number
 @app.route("/")
 def home():
     recipes = db.session.execute(
-        db.select(Recipe)
+        db.select(Recipe).order_by(Recipe.name)
     ).scalars().unique().all()
     
     return render_template("index.html", recipes=recipes)
@@ -30,20 +30,10 @@ def show_recipe(recipe_id):
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().unique().one_or_none()
 
-    # ingredients = db.session.execute(
-    #     db.select(Ingredient).where(Ingredient.recipe_id==recipe_id)
-    # ).scalars().unique().all()
-
-    # directions = db.session.execute(
-    #     db.select(Direction).where(Direction.recipe_id==recipe_id)
-    # ).scalars().unique().all()
-
     if recipe:
         return render_template(
             'recipe.html', 
             recipe=recipe, 
-            # ingredients=ingredients, 
-            # directions=directions,
         )
     else:
         abort(404)
