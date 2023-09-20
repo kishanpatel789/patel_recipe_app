@@ -7,3 +7,5 @@ seed_data/
 .env
 pg_data
 scratch.txt
+application/static/bootstrap*
+stylesheet_brynna.css
