@@ -1,10 +1,10 @@
 @charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Questrial&display=swap");
 /*!
  * Bootstrap  v5.3.2 (https://getbootstrap.com/)
  * Copyright 2011-2023 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Roboto:wght@100;400;500&display=swap");
 :root,
 [data-bs-theme=light] {
   --bs-blue: #0d6efd;
@@ -11857,7 +11857,7 @@ textarea.form-control-lg {
   }
 }
 :root {
-  --bs-body-font-family: "Jost", sans-serif;
+  --bs-body-font-family: "Questrial", sans-serif;
 }
 
 /*# sourceMappingURL=styles.css.map */

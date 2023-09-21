@@ -3,10 +3,10 @@ $primary: #56614D;
 $text-color: #2D3945;
 
 // Import Bootstrap from the CDN
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Roboto:wght@100;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
 @import '../bootstrap-5.3.2/scss/bootstrap';
 
 // Your custom styles go here
 :root {
-    --bs-body-font-family: 'Jost', sans-serif;
+    --bs-body-font-family: 'Questrial', sans-serif;
 }
