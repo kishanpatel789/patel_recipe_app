@@ -1,6 +1,6 @@
 // Override Bootstrap variables
 $primary: #56614D;
-$text-color: #2D3945;
+$text-color: #2D3945; // i don't think this is doing anything
 
 // Import Bootstrap from the CDN
 @import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
@@ -9,4 +9,21 @@ $text-color: #2D3945;
 // Your custom styles go here
 :root {
     --bs-body-font-family: 'Questrial', sans-serif;
+}
+
+.fixed-svg-col {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.left-side-svg {
+    max-height: 100%;
+    float: right;
+}
+
+.scrolling-col {
+    height: 100vh;
+    overflow-y: scroll;
 }
