@@ -14,11 +14,11 @@
     <div class="container-fluid">
       <div class="row">
 
-        <div class="col-4 fixed-svg-col">
+        <div class="col-md-4 d-none d-md-block fixed-svg-col">
           <img src="{{url_for('static', filename='svg/CurryLeafBorder.svg')}}" alt="Border image" class="left-side-svg">
         </div>
 
-        <div class="col scrolling-col">
+        <div class="col-md-8 scrolling-col">
           <div id="header">
             {% with messages = get_flashed_messages() %}
               {% if messages %}
