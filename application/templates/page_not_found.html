@@ -1,13 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Patel Recipes</title>
-</head>
-<body>
-    <h1>
-        sorry guys... i lost it
-    </h1>
-    <img src="{{url_for('static', filename='sorry.png')}}">
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}Oh nooo!{% endblock %}
+   
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <h1>
+                    sorry guys... this page is gone!
+                </h1>
+                <img src="{{url_for('static', filename='sorry.png')}}" class="rounded-circle img-fluid">
+            </div>
+        </div>
+    </div>
+{% endblock %}
