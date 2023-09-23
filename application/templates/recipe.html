@@ -43,7 +43,7 @@
     </ol>
   </div>
 
-  <div id="ingredients">
+  <div id="ingredients" class="pt-4">
     <h2>Ingredients</h2>
     <div class="row row-cols-1 row-cols-sm-2">
       {% for direction in recipe.directions %}
@@ -79,7 +79,7 @@
   </div>
 
   {% if recipe.complementary_dishes %}
-  <div id="complementaryDishes">
+  <div id="complementaryDishes" class="pt-4">
     <h2>Complementary Dishes</h2>
     <ul>
       {% for comp in recipe.complementary_dishes %}
@@ -92,7 +92,7 @@
   </div>
   {% endif %}
 
-  <div id="tags">
+  <div id="tags" class="pt-3">
     <span>
     {% for tag in recipe.tags %}
       #{{tag.name}}

@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>
+    <h1 class="display-1">
         Patel Recipes
     </h1>
-    <ul>
     {% for recipe in recipes %}
         <div>
-            <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}">{{recipe.name}}</a>
+            <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
         </div>
     {%endfor%}
-    </ul>
 {% endblock %}
