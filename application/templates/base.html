@@ -15,10 +15,36 @@
       <div class="row">
 
         <div class="col-md-4 d-none d-md-block fixed-svg-col">
-          <img src="{{url_for('static', filename='svg/CurryLeafBorder.svg')}}" alt="Border image" class="left-side-svg">
+          <img src="{{ url_for('static', filename='svg/CurryLeafBorder.svg') }}" alt="side panel image" class="left-side-svg">
         </div>
 
         <div class="col-md-8 scrolling-col">
+
+          <nav class="navbar bg-transparent">
+            <div class="container-fluid">
+              <div class="navbar-brand"></div>
+              <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                <div class="offcanvas-header">
+                  <a class="navbar-brand" href="{{ url_for('home') }}">
+                    <img src="{{ url_for('static', filename='svg/PatelRecipesMainLogo.svg') }}" alt="Patel Recipes Logo" width="60%">
+                  </a>
+                  <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+
+                <div class="offcanvas-body">
+                  <form class="d-flex mt-3" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search recipes" aria-label="Search">
+                    <button class="btn btn-outline-primary" type="submit">Search</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </nav>
+
           <div id="header">
             {% with messages = get_flashed_messages() %}
               {% if messages %}
@@ -40,7 +66,7 @@
           </div>
         
 
-        <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
+        <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
 
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
           <div class="offcanvas-header">
@@ -52,7 +78,7 @@
           </div>
         </div>
 
-      </div>
+      </div> -->
 
       </div>
 
