@@ -1,0 +1,11 @@
+[
+    {
+      "name": "Recipe 1",
+      "tags": ["TagA", "TagB"]
+    },
+    {
+      "name": "Recipe 2",
+      "tags": ["TagC"]
+    }
+  ]
+  

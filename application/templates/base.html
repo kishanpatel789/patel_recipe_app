@@ -27,7 +27,7 @@
                 <span class="navbar-toggler-icon"></span>
               </button>
 
-              <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+              <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" data-bs-autohide="false" aria-labelledby="offcanvasNavbarLabel">
                 <div class="offcanvas-header">
                   <a class="navbar-brand" href="{{ url_for('home') }}">
                     <img src="{{ url_for('static', filename='svg/PatelRecipesMainLogo.svg') }}" alt="Patel Recipes Logo" width="60%">
@@ -36,10 +36,9 @@
                 </div>
 
                 <div class="offcanvas-body">
-                  <form class="d-flex mt-3" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search recipes" aria-label="Search">
-                    <button class="btn btn-outline-primary" type="submit">Search</button>
-                  </form>
+                    <input id="search-input" class="form-control me-2" type="search" placeholder="Search recipes" aria-label="Search">
+                    <button id="search-button" class="btn btn-outline-primary" type="submit">Search</button>
+                  <div id="recipe-search-results"></div>
                 </div>
               </div>
             </div>
@@ -64,21 +63,6 @@
 
           <div id="footer">
           </div>
-        
-
-        <!-- <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
-
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasRightLabel">Search</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-          <div class="offcanvas-body">
-            ...
-          </div>
-        </div>
-
-      </div> -->
 
       </div>
 
@@ -87,6 +71,79 @@
     {% block scripts %}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="{{url_for('static', filename='js/jquery-3.7.0.js')}}"></script>
+
+    <script>
+    $(document).ready(function() {
+      // $("#search-button").click(function() {
+      //   $("#recipe-search-results").append("fail whale");
+      // })
+      // $("#recipe-search-results").append("fail whale");
+      // Sample recipe data (replace this with your actual data)
+      let recipes = [];
+    
+      // Function to display recipes
+      function displayRecipes(recipes) {
+        const recipeList = $('#recipe-search-results');
+        recipeList.empty(); // Clear previous results
+    
+        if (recipes.length === 0) {
+          recipeList.append('<p>No matching recipes found.</p>');
+          return;
+        }
+    
+        recipes.forEach(function(recipe) {
+          // Create a div for each recipe
+          const recipeDiv = $('<div class="recipe">');
+          recipeDiv.append('<h3>' + recipe.name + '</h3>');
+    
+          // Display tags
+          if (recipe.tags && recipe.tags.length > 0) {
+            const tagsList = $('<ul>');
+            recipe.tags.forEach(function(tag) {
+              tagsList.append('<li>' + tag + '</li>');
+            });
+            recipeDiv.append(tagsList);
+          }
+    
+          recipeList.append(recipeDiv);
+        });
+      }
+    
+      // Initial display of all recipes
+      // displayRecipes(recipes);
+
+      // Function to load recipes from JSON file
+      function loadRecipes() {
+        $.getJSON('../search_recipe_data.json', function(data) {
+          // Assuming the JSON file is named 'recipes.json'
+          recipes = data; // Assign the fetched data to the 'recipes' array
+          // displayRecipes(recipes); // Display recipes after loading
+        })
+        .fail(function() {
+          console.error('Failed to load recipe data.');
+        });
+      }
+
+      // Load recipes when the page loads
+      loadRecipes();
+    
+      // Event listener for the search button
+      $('#search-button').click(function() {
+        const query = $('#search-input').val().toLowerCase();
+    
+        // Perform the search
+        const matchingRecipes = recipes.filter(function(recipe) {
+          return (
+            recipe.name.toLowerCase().includes(query) 
+          );
+        });
+    
+        // Display matching recipes
+        displayRecipes(matchingRecipes);
+      });
+    });
+  </script>
+    
     {% endblock %}
     
   </body>
