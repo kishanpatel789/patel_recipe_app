@@ -74,11 +74,7 @@
 
     <script>
     $(document).ready(function() {
-      // $("#search-button").click(function() {
-      //   $("#recipe-search-results").append("fail whale");
-      // })
-      // $("#recipe-search-results").append("fail whale");
-      // Sample recipe data (replace this with your actual data)
+      // sample recipe data (replace this with your actual data)
       let recipes = [];
     
       // Function to display recipes
@@ -94,8 +90,8 @@
         recipes.forEach(function(recipe) {
           // Create a div for each recipe
           const recipeDiv = $('<div class="recipe">');
-          recipeDiv.append('<h3>' + recipe.name + '</h3>');
-    
+          recipeDiv.append('<h4>' + recipe.name + '</h4>');
+
           // Display tags
           if (recipe.tags && recipe.tags.length > 0) {
             const tagsList = $('<ul>');
@@ -109,15 +105,10 @@
         });
       }
     
-      // Initial display of all recipes
-      // displayRecipes(recipes);
-
       // Function to load recipes from JSON file
       function loadRecipes() {
-        $.getJSON('../search_recipe_data.json', function(data) {
-          // Assuming the JSON file is named 'recipes.json'
+        $.getJSON("{{ url_for('static', filename='search_recipe_data.json') }}", function(data) {
           recipes = data; // Assign the fetched data to the 'recipes' array
-          // displayRecipes(recipes); // Display recipes after loading
         })
         .fail(function() {
           console.error('Failed to load recipe data.');
@@ -142,7 +133,7 @@
         displayRecipes(matchingRecipes);
       });
     });
-  </script>
+    </script>
     
     {% endblock %}
     
