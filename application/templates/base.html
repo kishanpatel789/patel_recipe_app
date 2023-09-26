@@ -89,15 +89,15 @@
     
         recipes.forEach(function(recipe) {
           // Create a div for each recipe
-          const recipeDiv = $('<div class="recipe">');
-          recipeDiv.append('<h4>' + recipe.name + '</h4>');
+          const recipeDiv = $("<div>");
+          recipeDiv.append("<a href=/recipe/" + recipe.id + ">" + recipe.name + "</a>");
 
           // Display tags
           if (recipe.tags && recipe.tags.length > 0) {
-            const tagsList = $('<ul>');
-            recipe.tags.forEach(function(tag) {
-              tagsList.append('<li>' + tag + '</li>');
-            });
+            const tagsList = $('<span>')
+              .text(recipe.tags.join(" "))
+              .addClass("small")
+              .addClass("ps-2");
             recipeDiv.append(tagsList);
           }
     
@@ -120,7 +120,7 @@
     
       // Event listener for the search button
       $('#search-button').click(function() {
-        const query = $('#search-input').val().toLowerCase();
+        const query = $('#search-input').val().trim().toLowerCase();
     
         // Perform the search
         const matchingRecipes = recipes.filter(function(recipe) {
