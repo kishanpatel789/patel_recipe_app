@@ -74,8 +74,8 @@
 
     <script>
     $(document).ready(function() {
-      // sample recipe data (replace this with your actual data)
-      let recipes = [];
+      // array holding recipe data
+      let recipeData = [];
     
       // Function to display recipes
       function displayRecipes(recipes) {
@@ -108,7 +108,7 @@
       // Function to load recipes from JSON file
       function loadRecipes() {
         $.getJSON("{{ url_for('static', filename='search_recipe_data.json') }}", function(data) {
-          recipes = data; // Assign the fetched data to the 'recipes' array
+          recipeData = data; // Assign the fetched data to the 'recipes' array
         })
         .fail(function() {
           console.error('Failed to load recipe data.');
@@ -117,21 +117,29 @@
 
       // Load recipes when the page loads
       loadRecipes();
-    
-      // Event listener for the search button
-      $('#search-button').click(function() {
+
+      function searchRecipes() {
         const query = $('#search-input').val().trim().toLowerCase();
     
         // Perform the search
-        const matchingRecipes = recipes.filter(function(recipe) {
+        const matchingRecipes = recipeData.filter(function(recipe) {
           return (
-            recipe.name.toLowerCase().includes(query) 
+            recipe.name.toLowerCase().includes(query) ||
+            (recipe.tags && recipe.tags.some(tag => tag.toLowerCase().includes(query)))
           );
         });
     
         // Display matching recipes
         displayRecipes(matchingRecipes);
-      });
+      }
+    
+      // Event listener for the search button and enter key
+      $('#search-button').click(searchRecipes);
+      $('#search-input').on("keydown", function (event) {
+        if (event.keyCode === 13) { // Check if the pressed key is Enter (key code 13)
+          searchRecipes(); // Call the search function
+        }
+    });
     });
     </script>
     
