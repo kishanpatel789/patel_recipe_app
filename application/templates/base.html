@@ -76,6 +76,7 @@
     $(document).ready(function() {
       // array holding recipe data
       let recipeData = [];
+      let tagData = []
     
       // Function to display recipes
       function displayRecipes(recipes) {
@@ -107,11 +108,18 @@
     
       // Function to load recipes from JSON file
       function loadRecipes() {
-        $.getJSON("{{ url_for('static', filename='search_recipe_data.json') }}", function(data) {
-          recipeData = data; // Assign the fetched data to the 'recipes' array
+        $.getJSON("{{ url_for('static', filename='json/search_recipe_data.json') }}", function(data) {
+          recipeData = data; // Assign the fetched data to the 'recipesData' array
         })
         .fail(function() {
           console.error('Failed to load recipe data.');
+        });
+
+        $.getJSON("{{ url_for('static', filename='json/search_tag_data.json') }}", function(data) {
+          tagData = data; // Assign the fetched data to the 'tagData' array
+        })
+        .fail(function() {
+          console.error('Failed to load tag data.');
         });
       }
 
