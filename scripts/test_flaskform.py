@@ -3,6 +3,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired, Length, InputRequired
 
+import sys
+sys.path.insert(1, '..')
+
 from application.forms import RecipeForm, BaseForm
 from application import create_app
 

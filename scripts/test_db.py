@@ -1,4 +1,6 @@
 # %%
+import sys
+sys.path.insert(1, '..')
 
 from application import create_app
 from application.models import db, Recipe, Ingredient, Direction, Unit, Tag
