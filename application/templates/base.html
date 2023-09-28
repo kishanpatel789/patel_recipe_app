@@ -36,8 +36,7 @@
                 </div>
 
                 <div class="offcanvas-body">
-                    <input id="search-input" class="form-control me-2" type="search" placeholder="Search recipes" aria-label="Search">
-                    <button id="search-button" class="btn btn-outline-primary" type="submit">Search</button>
+                    <input id="search-input" class="form-control me-2" type="search" placeholder="Search Recipes" aria-label="Search">
                   <div id="recipe-search-results"></div>
                 </div>
               </div>
@@ -76,7 +75,6 @@
     $(document).ready(function() {
       // array holding recipe data
       let recipeData = [];
-      let tagData = []
     
       // Function to display recipes
       function displayRecipes(recipes) {
@@ -114,13 +112,6 @@
         .fail(function() {
           console.error('Failed to load recipe data.');
         });
-
-        $.getJSON("{{ url_for('static', filename='json/search_tag_data.json') }}", function(data) {
-          tagData = data; // Assign the fetched data to the 'tagData' array
-        })
-        .fail(function() {
-          console.error('Failed to load tag data.');
-        });
       }
 
       // Load recipes when the page loads
@@ -142,7 +133,6 @@
       }
     
       // Event listener for the search button and enter key
-      $('#search-button').click(searchRecipes);
       $('#search-input').on("keydown", function (event) {
         if (event.keyCode === 13) { // Check if the pressed key is Enter (key code 13)
           searchRecipes(); // Call the search function
