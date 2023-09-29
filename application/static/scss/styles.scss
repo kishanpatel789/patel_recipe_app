@@ -1,6 +1,12 @@
 // Override Bootstrap variables
 $primary: #56614D;
-$text-color: #2D3945; // i don't think this is doing anything
+$secondary: #50554B;
+$danger: #853C2C;
+$body-color: #2D3945;
+// $text-color: #2D3945; // i don't think this is doing anything
+
+$link-decoration: none;
+$link-hover-decoration: underline;
 
 // Import Bootstrap from the CDN
 @import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
