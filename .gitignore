@@ -10,3 +10,4 @@ scratch.txt
 application/static/bootstrap*
 stylesheet_brynna.css
 .DS_Store
+static_site*
