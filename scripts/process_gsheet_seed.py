@@ -12,6 +12,7 @@ PATH_GSHEET_CSV = '../seed_data/src/gsheet_seed_data.csv'
 PATH_RECIPE_CSV = '../seed_data/data_recipe.csv'
 PATH_DIRECTION_CSV = '../seed_data/data_direction.csv'
 PATH_INGREDIENT_CSV = '../seed_data/data_ingredient.csv'
+PATH_RECIPETAG_CSV = '../seed_data/data_recipetag.csv'
 
 FIELD_NAMES_RECIPE = [
     'id',
@@ -35,6 +36,10 @@ FIELD_NAMES_INGREDIENT = [
     'unit_id',
     'item',
 ]
+FIELD_NAMES_RECIPETAG = [
+    'recipe_id',
+    'tag_id',
+]
 
 # %%
 # initialize counters
@@ -54,6 +59,17 @@ unit_mapper = {
     "leaves": 9,
 }
 
+# define tag mapper
+tag_mapper = {
+    'MainDish': 1,
+    'SideItem': 2,
+    'Dessert': 3,
+    'Snack': 4,
+    'Veggie': 5,
+    'Chicken': 6,
+}
+
+
 
 # %%
 # initialize output files
@@ -68,6 +84,11 @@ with open(PATH_DIRECTION_CSV, 'w', newline='\n') as csvfile:
 with open(PATH_INGREDIENT_CSV, 'w', newline='\n') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_INGREDIENT)
     writer.writeheader()
+
+with open(PATH_RECIPETAG_CSV, 'w', newline='\n') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_RECIPETAG)
+    writer.writeheader()
+
 
 
 # %%
@@ -87,6 +108,19 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
                     'name': recipe_name,
                     'created_by': 1,
                 })
+
+            # parse tags
+            if row['Tags'].strip():
+                print("Got tags!", row['Tags'].strip())
+                for new_tag_raw in row['Tags'].strip().split(';'):
+                    new_tag_name = new_tag_raw.strip().replace(' ', '') # strip and remove white spaces
+                    new_tag_id = tag_mapper[new_tag_name]
+                    with open(PATH_RECIPETAG_CSV, 'a', newline='\n') as csvfile:
+                        writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_RECIPETAG)
+                        writer.writerow({
+                            'recipe_id': recipe_id,
+                            'tag_id': new_tag_id,
+                        })
 
         if row['DirectionText'].strip(): # this starts a new direction
             direction_desc = row['DirectionText'].strip()
@@ -124,3 +158,5 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
 
 
 
+
+# %%
