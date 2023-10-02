@@ -19,14 +19,23 @@ OUTPUT_DIRECTORY = '../static_site'
 #   js/jquery
 #   json/search_data
 #   scss/styles.css
+#   svg/CurryLeafBorder.svg
+#   svg/SingleCurryBranch.svg
 #   favicon
 #   sorry.png
 
-recipe_count = 5
 recipe_urls = [
     (BASE_URL, 'index.html'),
     ('/'.join([BASE_URL, '404.html']), '404.html')
 ]
+
+# map recipe card pages
+recipe_count = 5
+for i in range(1, recipe_count+1):
+    recipe_urls.append(
+        ('/'.join([BASE_URL, f'recipe/{i}']), f'recipe/{i}/index.html')
+        )
+
 
 static_resources = [
     'js/jquery-3.7.0.js',
@@ -37,25 +46,6 @@ static_resources = [
     'favicon.ico',
     'sorry.png',
 ]
-
-for i in range(1, recipe_count+1):
-    recipe_urls.append(
-        ('/'.join([BASE_URL, f'recipe/{i}']), f'recipe/{i}')
-        )
-
-
-# %%
-
-# # Create the output directory if it doesn't exist
-# os.makedirs(OUTPUT_DIRECTORY, exist_ok=True)
-
-# response = requests.get(BASE_URL)
-# soup = BeautifulSoup(response.content, 'html.parser')
-
-# file_name = os.path.join(OUTPUT_DIRECTORY, f'index.html')
-        
-# with open(file_name, 'w', encoding='utf-8') as f:
-#     f.write(str(soup))
 
 # %%
 # Loop through each URL and convert it to a static HTML file
@@ -81,9 +71,9 @@ for url, file_name in recipe_urls:
     else:
         print(f'Failed to fetch {url}')
 
-print('Conversion complete.')
 
 # %%
+# copy static resources
 for static_res in static_resources:
     src_path = '/'.join([APP_DIR, 'static', static_res])
     dest_path = '/'.join([OUTPUT_DIRECTORY, 'static', static_res])
