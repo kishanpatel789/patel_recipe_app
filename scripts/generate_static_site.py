@@ -56,6 +56,11 @@ for url, file_name in recipe_urls:
     if (response.status_code == 200) or (response.status_code == 404 and file_name == '404.html'):
         # Parse the HTML content
         soup = BeautifulSoup(response.content, 'html.parser')
+
+        # remove edit button if applicable
+        edit_button = soup.find(id='editButton')
+        if edit_button:
+            edit_button.extract()
         
         # Define the filename for the static HTML page (you can customize this)
         file_path = os.path.join(OUTPUT_DIRECTORY, file_name)
