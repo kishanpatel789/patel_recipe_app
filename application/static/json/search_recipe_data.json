@@ -1,13 +1,40 @@
 [
     {
-      "id": 1,
-      "name": "Channa Masala",
-      "tags": ["#Indian", "#Vegetarian"]
+        "id": 3,
+        "name": "Chaas",
+        "tags": [
+            "#SideItem"
+        ]
     },
     {
-      "id": 2,
-      "name": "Chocolate Chip Cookies",
-      "tags": ["#Dessert"]
+        "id": 1,
+        "name": "Channa Masala",
+        "tags": [
+            "#MainDish",
+            "#Veggie"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Chocolate Chip Cookies",
+        "tags": [
+            "#Dessert"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Giloda Nu Shak",
+        "tags": [
+            "#MainDish",
+            "#Veggie"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Vagharelo Vegetable Khichdi",
+        "tags": [
+            "#MainDish",
+            "#Veggie"
+        ]
     }
-  ]
-  
+]
