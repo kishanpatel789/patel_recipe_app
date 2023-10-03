@@ -62,7 +62,7 @@
             {% block content %}{% endblock %}
           </div>
 
-          <div id="footer">
+          <div id="footer" class="my-5 py-5">
           </div>
 
       </div>
@@ -98,7 +98,8 @@
             const tagsList = $('<span>')
               .text(recipe.tags.join(" "))
               .addClass("small")
-              .addClass("ps-2");
+              .addClass("ps-2")
+              .addClass("text-muted");
             recipeDiv.append(tagsList);
           }
     
