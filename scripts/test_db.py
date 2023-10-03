@@ -3,18 +3,18 @@ import sys
 sys.path.insert(1, '..')
 
 from application import create_app
-from application.models import db, Recipe, Ingredient, Direction, Unit, Tag
+from application.models import db, Recipe, Ingredient, Direction, Unit, Tag, recipe_tag
 
 # %%
 app = create_app()
 
 # %%
 with app.app_context():
-    rep = db.session.execute(
-        db.select(Recipe).where(Recipe.id==2)
-    ).scalars().unique().one_or_none()
+    # rep = db.session.execute(
+    #     db.select(Recipe).where(Recipe.id==2)
+    # ).scalars().unique().one_or_none()
     # db.session.delete(rep)
-    existing_dirs = {d.order_id for d in rep.directions}
+    # existing_dirs = {d.order_id for d in rep.directions}
 
     # comp = rep.complementary_dishes.all()
 
@@ -40,5 +40,26 @@ with app.app_context():
     # db.session.delete(direction)
 
     # db.session.commit()
+
+    recipes = db.session.execute(
+        db.select(Recipe).order_by(Recipe.name)
+    ).scalars().unique().all()
+    # recipes = db.session.execute(
+    #     db.select(Recipe.name.label('recipe_name'), Tag.name.label('tag_name'))\
+    #         .select_from(Recipe).join(recipe_tag, isouter=True)\
+    #             .join(Tag, isouter=True)
+    # ).all()
+
+    for r in recipes:
+        print(r.name)
+        for t in r.tags:
+            print(t.name)
+
+    # tt = db.session.execute(
+    # db.select(Recipe, Tag).\
+    # join(Recipe.tags).\
+    # join(Tag, Recipe.tags).\
+    # order_by(Recipe.id)
+    # )
 
 # %%

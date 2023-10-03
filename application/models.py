@@ -42,6 +42,7 @@ class Recipe(db.Model):
        "Tag", 
        secondary=recipe_tag, 
        lazy="select",
+       order_by="Tag.name"
     )
 
     complementary_dishes = db.relationship(
