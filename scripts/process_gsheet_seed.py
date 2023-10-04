@@ -13,6 +13,9 @@ PATH_RECIPE_CSV = '../seed_data/data_recipe.csv'
 PATH_DIRECTION_CSV = '../seed_data/data_direction.csv'
 PATH_INGREDIENT_CSV = '../seed_data/data_ingredient.csv'
 PATH_RECIPETAG_CSV = '../seed_data/data_recipetag.csv'
+PATH_COMPLEMENTARYDISH_CSV = '../seed_data/data_complementarydish.csv'
+PATH_COMPLEMENTARYDISH_TMP = '../seed_data/data_complementarydish_tmp.csv'
+
 
 FIELD_NAMES_RECIPE = [
     'id',
@@ -40,6 +43,16 @@ FIELD_NAMES_RECIPETAG = [
     'recipe_id',
     'tag_id',
 ]
+FIELD_NAMES_COMPLEMENTARYDISH = [
+    'recipe_id',
+    'comp_recipe_id',
+]
+FIELD_NAMES_COMPLEMENTARYDISH_TMP = [
+    'recipe_id',
+    'recipe_name',
+    'comp_recipe_name',
+]
+
 
 # %%
 # initialize counters
@@ -51,7 +64,7 @@ ingredient_order_id = 0
 
 # define unit mapper
 unit_mapper = {
-    "units": 1,
+    "unit": 1,
     "tbsp": 3,
     "tsp": 2,
     "oz": 4,
@@ -67,6 +80,7 @@ tag_mapper = {
     'Snack': 4,
     'Veggie': 5,
     'Chicken': 6,
+    'Dressing':7,
 }
 
 
@@ -87,6 +101,14 @@ with open(PATH_INGREDIENT_CSV, 'w', newline='\n') as csvfile:
 
 with open(PATH_RECIPETAG_CSV, 'w', newline='\n') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_RECIPETAG)
+    writer.writeheader()
+
+with open(PATH_COMPLEMENTARYDISH_CSV, 'w', newline='\n') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_COMPLEMENTARYDISH)
+    writer.writeheader()
+
+with open(PATH_COMPLEMENTARYDISH_TMP, 'w', newline='\n') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_COMPLEMENTARYDISH_TMP)
     writer.writeheader()
 
 
@@ -111,7 +133,6 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
 
             # parse tags
             if row['Tags'].strip():
-                print("Got tags!", row['Tags'].strip())
                 for new_tag_raw in row['Tags'].strip().split(';'):
                     new_tag_name = new_tag_raw.strip().replace(' ', '') # strip and remove white spaces
                     new_tag_id = tag_mapper[new_tag_name]
@@ -121,6 +142,19 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
                             'recipe_id': recipe_id,
                             'tag_id': new_tag_id,
                         })
+
+            # parse complementary dishes
+            if row['ComplementaryDishes'].strip():
+                for comp_dish_raw in row['ComplementaryDishes'].strip().split(';'):
+                    comp_dish = comp_dish_raw.strip() # strip and remove white spaces
+                    with open(PATH_COMPLEMENTARYDISH_TMP, 'a', newline='\n') as csvfile:
+                        writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_COMPLEMENTARYDISH_TMP)
+                        writer.writerow({
+                            'recipe_id': recipe_id,
+                            'recipe_name': recipe_name,
+                            'comp_recipe_name': comp_dish,
+                        })
+
 
         if row['DirectionText'].strip(): # this starts a new direction
             direction_desc = row['DirectionText'].strip()
@@ -157,6 +191,32 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
                 })
 
 
+
+
+# %%
+# clean complementary dish file
+recipe_mapper = {}
+with open(PATH_RECIPE_CSV, newline='\n') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+        recipe_mapper[row['name']] = row['id']
+
+# loop through tmp comp file, map id, write to comp file
+with open(PATH_COMPLEMENTARYDISH_TMP, newline='\n') as tmpfile:
+    reader = csv.DictReader(tmpfile)
+    with open(PATH_COMPLEMENTARYDISH_CSV, 'a', newline='\n') as csvfile: 
+        writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_COMPLEMENTARYDISH)
+        for row in reader:
+            recipe_id = row['recipe_id']
+            try:
+                comp_recipe_id = recipe_mapper[row['comp_recipe_name']]
+                writer.writerow({
+                    'recipe_id': recipe_id,
+                    'comp_recipe_id': comp_recipe_id,
+                })
+                print(f"'{row['recipe_name']}' ({recipe_id}) has '{row['comp_recipe_name']}' ({comp_recipe_id}) as a complement")
+            except KeyError:
+                print(f"No ID found for recipe '{row['comp_recipe_name']}'")
 
 
 # %%
