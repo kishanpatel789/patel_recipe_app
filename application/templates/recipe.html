@@ -6,7 +6,15 @@
 
   <h1 class="display-1">{{recipe.name}}</h1>
 
-  <div id="directions" class="pt-3">
+  <div id="tags">
+    <span class="text-muted">
+    {% for tag in recipe.tags %}
+      #{{tag.name}}
+    {% endfor %}
+    </span>
+  </div>
+
+  <div id="directions" class="pt-4">
     <h2>Directions</h2>
     <ol>
       {% for direction in recipe.directions %}
@@ -91,14 +99,6 @@
     </ul>
   </div>
   {% endif %}
-
-  <div id="tags" class="pt-3">
-    <span class="text-muted">
-    {% for tag in recipe.tags %}
-      #{{tag.name}}
-    {% endfor %}
-    </span>
-  </div>
 
   <div class="pt-3">
     <button type="button" class="btn btn-info" id="resetButton">Reset</button>
