@@ -22,11 +22,41 @@
         ]
     },
     {
+        "id": 8,
+        "name": "Coconut Curry Dal",
+        "tags": [
+            "#MainDish",
+            "#Veggie"
+        ]
+    },
+    {
         "id": 4,
         "name": "Giloda Nu Shak",
         "tags": [
             "#MainDish",
             "#Veggie"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Mac and Cheese",
+        "tags": [
+            "#SideItem",
+            "#Veggie"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "Oat Cakes",
+        "tags": [
+            "#Snack"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Tahini Dressing",
+        "tags": [
+            "#Dressing"
         ]
     },
     {

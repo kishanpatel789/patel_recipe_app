@@ -8,7 +8,7 @@ import shutil
 BASE_URL = 'http://localhost:5000'
 APP_DIR = '../application'
 OUTPUT_DIRECTORY = '../static_site'
-
+RECIPE_COUNT = 9
 
 # %%
 # Define a list of URLs to convert to static pages
@@ -30,8 +30,7 @@ recipe_urls = [
 ]
 
 # map recipe card pages
-recipe_count = 5
-for i in range(1, recipe_count+1):
+for i in range(1, RECIPE_COUNT+1):
     recipe_urls.append(
         ('/'.join([BASE_URL, f'recipe/{i}']), f'recipe/{i}/index.html')
         )
@@ -43,6 +42,7 @@ static_resources = [
     'scss/styles.css',
     'svg/CurryLeafBorder.svg',
     'svg/SingleCurryBranch.svg',
+    'svg/SingleCurryBranch_short.svg',
     'favicon.ico',
     'sorry.png',
 ]
