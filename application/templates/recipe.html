@@ -26,7 +26,7 @@
             <li>
               {{ item.item }}
               {% if item.quantity %}
-                -  
+                &ndash;  
                 {{ item.quantity | format_number }} 
                 {% if item.quantity != 1 %}
                   {% if item.unit.abbr_plural %}
@@ -62,7 +62,7 @@
             <span>
               {{ item.item }}
               {% if item.quantity %}
-                -  
+                &ndash;  
                 {{ item.quantity | format_number }} 
                 {% if item.quantity != 1 %}
                   {% if item.unit.abbr_plural %}

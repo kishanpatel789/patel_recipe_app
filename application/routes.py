@@ -2,6 +2,7 @@ from flask import render_template, make_response, abort, \
     redirect, url_for, flash, request
 from flask import current_app as app
 import json
+from fractions import Fraction
 
 from .models import db, Recipe, Ingredient, Direction, Tag, Unit
 from .forms import TagForm, UnitForm, RecipeForm, IngredientForm
@@ -10,7 +11,15 @@ from .forms import TagForm, UnitForm, RecipeForm, IngredientForm
 def format_number(value):
     if isinstance(value, float):
         if int(value) == value:
-            return int(value)
+            return str(int(value))
+        else:
+            frac = Fraction(value).limit_denominator(10)
+            whole = frac.numerator // frac.denominator
+            remainder = frac.numerator % frac.denominator 
+            if whole != 0:
+                return f"{whole}-{Fraction(remainder, frac.denominator)}"
+            else:
+                return f"{Fraction(remainder, frac.denominator)}"
     return value
 app.jinja_env.filters['format_number'] = format_number
 
