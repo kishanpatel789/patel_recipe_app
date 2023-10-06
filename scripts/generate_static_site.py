@@ -8,7 +8,7 @@ import shutil
 BASE_URL = 'http://localhost:5000'
 APP_DIR = '../application'
 OUTPUT_DIRECTORY = '../static_site'
-RECIPE_COUNT = 9
+RECIPE_COUNT = 10
 
 # %%
 # Define a list of URLs to convert to static pages

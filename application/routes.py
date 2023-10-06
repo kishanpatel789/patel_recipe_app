@@ -17,7 +17,7 @@ def format_number(value):
             whole = frac.numerator // frac.denominator
             remainder = frac.numerator % frac.denominator 
             if whole != 0:
-                return f"{whole}-{Fraction(remainder, frac.denominator)}"
+                return f"{whole} {Fraction(remainder, frac.denominator)}"
             else:
                 return f"{Fraction(remainder, frac.denominator)}"
     return value
