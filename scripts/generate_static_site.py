@@ -3,12 +3,26 @@ import os
 import requests
 from bs4 import BeautifulSoup
 import shutil
+import sys
+sys.path.insert(1, '..')
+
+from application import create_app
+from application.models import db, Recipe
+
+# %%
+app = create_app()
 
 # %%
 BASE_URL = 'http://localhost:5000'
 APP_DIR = '../application'
 OUTPUT_DIRECTORY = '../static_site'
-RECIPE_COUNT = 10
+
+# %%
+# get recipe count
+with app.app_context():
+    recipe_count = db.session.execute(
+        db.select(db.func.max(Recipe.id))
+    ).scalar()
 
 # %%
 # Define a list of URLs to convert to static pages
@@ -30,7 +44,7 @@ recipe_urls = [
 ]
 
 # map recipe card pages
-for i in range(1, RECIPE_COUNT+1):
+for i in range(1, recipe_count+1):
     recipe_urls.append(
         ('/'.join([BASE_URL, f'recipe/{i}']), f'recipe/{i}/index.html')
         )

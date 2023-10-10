@@ -30,11 +30,33 @@
         ]
     },
     {
+        "id": 13,
+        "name": "Curry Chana Salad",
+        "tags": [
+            "#MainDish",
+            "#Veggie"
+        ]
+    },
+    {
         "id": 4,
         "name": "Giloda Nu Shak",
         "tags": [
             "#MainDish",
             "#Veggie"
+        ]
+    },
+    {
+        "id": 12,
+        "name": "Greek Salad Dressing",
+        "tags": [
+            "#Dressing"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "Hummus",
+        "tags": [
+            "#Snack"
         ]
     },
     {
