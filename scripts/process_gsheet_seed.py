@@ -80,7 +80,9 @@ tag_mapper = {
     'Snack': 4,
     'Veggie': 5,
     'Chicken': 6,
-    'Dressing':7,
+    'Dressing': 7,
+    'Bread': 8,
+    'Chutney': 9,
 }
 
 
@@ -173,8 +175,8 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
         else: # this is an ingredient line
             ingredient_id += 1
             ingredient_order_id += 1
-            ingredient_quantity = row['IngredientQty']
-            ingredient_unit_raw = row['IngredientUnit']
+            ingredient_quantity = row['IngredientQty'].strip()
+            ingredient_unit_raw = row['IngredientUnit'].strip()
             ingredient_item = row['IngredientItem'].strip()
 
             ingredient_unit_id = unit_mapper[ingredient_unit_raw]
