@@ -14,7 +14,7 @@
     </span>
   </div>
 
-  <div id="directions" class="pt-4">
+  <div id="directions" class="pt-4 ps-1">
     <h2>Directions</h2>
     <ol>
       {% for direction in recipe.directions %}
@@ -51,7 +51,7 @@
     </ol>
   </div>
 
-  <div id="ingredients" class="pt-4">
+  <div id="ingredients" class="pt-4 ps-1">
     <h2>Ingredients</h2>
     <div class="row row-cols-1 row-cols-sm-2">
       {% for direction in recipe.directions %}
@@ -87,7 +87,7 @@
   </div>
 
   {% if recipe.complementary_dishes %}
-  <div id="complementaryDishes" class="pt-4">
+  <div id="complementaryDishes" class="pt-4 ps-1">
     <h2>Complementary Dishes</h2>
     <ul>
       {% for comp in recipe.complementary_dishes %}
@@ -100,7 +100,7 @@
   </div>
   {% endif %}
 
-  <div class="pt-3">
+  <div class="pt-3 ps-1">
     <button type="button" class="btn btn-info" id="resetButton">Reset</button>
     <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-info" id="editButton">Edit</a>
   </div>
