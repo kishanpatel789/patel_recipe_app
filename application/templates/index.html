@@ -10,15 +10,15 @@
     <div class="row">
         <div class="col-12 col-md-6 col-xl-4">
             {% for recipe in recipes[:midpoint] %}
-                <div>
-                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
+                <div class="ps-2 pb-1">
+                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="fs-5">{{recipe.name}}</a>
                 </div>
             {%endfor%}
         </div>
         <div class="col-12 col-md-6 col-xl-4">
             {% for recipe in recipes[midpoint:] %}
-                <div>
-                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
+                <div class="ps-2 pb-1">
+                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="fs-5">{{recipe.name}}</a>
                 </div>
             {%endfor%}
         </div>
