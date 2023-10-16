@@ -28,8 +28,13 @@ def home():
     recipes = db.session.execute(
         db.select(Recipe).order_by(Recipe.name)
     ).scalars().unique().all()
+
+    if len(recipes) % 2 == 0:
+        midpoint = len(recipes) // 2
+    else:
+        midpoint = len(recipes) // 2 + 1
     
-    return render_template("index.html", recipes=recipes)
+    return render_template("index.html", recipes=recipes, midpoint=midpoint)
 
 # recipe
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])

@@ -7,9 +7,23 @@
             Patel Recipes
         </h1>
     </div>
-    {% for recipe in recipes %}
-        <div>
-            <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
+    <div class="row">
+        <div class="col-12 col-md-6 col-xl-4">
+            {% for recipe in recipes[:midpoint] %}
+                <div>
+                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
+                </div>
+            {%endfor%}
         </div>
-    {%endfor%}
+        <div class="col-12 col-md-6 col-xl-4">
+            {% for recipe in recipes[midpoint:] %}
+                <div>
+                    <a href="{{url_for('show_recipe', recipe_id=recipe.id)}}" class="ps-2">{{recipe.name}}</a>
+                </div>
+            {%endfor%}
+        </div>
+        <div class="col-xl-4">
+
+        </div>
+    </div>
 {% endblock %}
