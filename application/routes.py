@@ -44,10 +44,46 @@ def show_recipe(recipe_id):
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().unique().one_or_none()
 
+    # get ingredients
+    ingredients_subquery = (db.select(
+        Ingredient.item, 
+        Ingredient.unit_id,
+        db.func.sum(Ingredient.quantity).label('quantity'),
+        db.func.min(Ingredient.direction_id * 100 + Ingredient.order_id).label('comb_order_id'),
+        )
+        .select_from(Recipe)
+        .join(Direction)
+        .join(Ingredient)
+        .where(Recipe.id==16)
+        .group_by(
+            Ingredient.item,
+            Ingredient.unit_id,
+        )
+    ).subquery()
+
+    ingredients_raw = db.session.execute(
+        db.select(
+        ingredients_subquery.c.comb_order_id,
+        ingredients_subquery.c.item,
+        ingredients_subquery.c.quantity,
+        ingredients_subquery.c.unit_id,
+        Unit.name.label('unit_name'),
+        Unit.name_plural.label('unit_name_plural'),
+        Unit.abbr_singular.label('unit_abbr_singular'),
+        Unit.abbr_plural.label('unit_abbr_plural'),
+        )
+        .select_from(ingredients_subquery)
+        .join(Unit, isouter=True)
+        .order_by('comb_order_id')
+    ).all()
+
+    ingredients = [row._asdict() for row in ingredients_raw]
+
     if recipe:
         return render_template(
             'recipe.html', 
             recipe=recipe, 
+            ingredients=ingredients,
         )
     else:
         abort(404)

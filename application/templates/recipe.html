@@ -54,34 +54,32 @@
   <div id="ingredients" class="pt-4 ps-1">
     <h2>Ingredients</h2>
     <div class="row row-cols-1 row-cols-sm-2">
-      {% for direction in recipe.directions %}
-        {% for item in direction.ingredients %}
-        <div class="col">  
-          <label>
-            <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
-            <span>
-              {{ item.item }}
-              {% if item.quantity %}
-                &ndash;  
-                {{ item.quantity | format_number }} 
-                {% if item.quantity != 1 %}
-                  {% if item.unit.abbr_plural %}
-                    {{ item.unit.abbr_plural }}
-                  {% else %}
-                    {{ item.unit.name_plural }}
-                  {% endif %}
+      {% for item in ingredients %}
+      <div class="col">  
+        <label>
+          <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
+          <span>
+            {{ item.item }}
+            {% if item.quantity %}
+              &ndash;  
+              {{ item.quantity | format_number }} 
+              {% if item.quantity != 1 %}
+                {% if item.unit_abbr_plural %}
+                  {{ item.unit_abbr_plural }}
                 {% else %}
-                  {% if item.unit.abbr_singular %}
-                    {{ item.unit.abbr_singular }}
-                  {% else %}
-                    {{ item.unit.name }}
-                  {% endif %}
+                  {{ item.unit_name_plural }}
+                {% endif %}
+              {% else %}
+                {% if item.unit_abbr_singular %}
+                  {{ item.unit_abbr_singular }}
+                {% else %}
+                  {{ item.unit_name }}
                 {% endif %}
               {% endif %}
-            </span>
-          </label>
-        </div>
-        {% endfor %}
+            {% endif %}
+          </span>
+        </label>
+      </div>
       {% endfor %}
     </div>
   </div>

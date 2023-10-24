@@ -62,12 +62,11 @@ with app.app_context():
     # order_by(Recipe.id)
     # )
 
-    ingr = db.session.execute(
-        db.select(
+    subquery = (db.select(
         Ingredient.item, 
         Ingredient.unit_id,
         db.func.sum(Ingredient.quantity).label('quantity'),
-        db.func.min(Ingredient.order_id).label('order_id'),
+        db.func.min(Ingredient.direction_id * 100 + Ingredient.order_id).label('comb_order_id'),
         )
         .select_from(Recipe)
         .join(Direction)
@@ -77,17 +76,30 @@ with app.app_context():
             Ingredient.item,
             Ingredient.unit_id,
         )
-        .order_by('order_id')
+        .order_by('comb_order_id')
+    ).subquery()
+
+    ingr = db.session.execute(
+        db.select(
+        subquery.c.comb_order_id,
+        subquery.c.item,
+        subquery.c.quantity,
+        subquery.c.unit_id,
+        Unit.name.label('unit_name'),
+        Unit.name_plural.label('unit_name_plural'),
+        Unit.abbr_singular.label('unit_abbr_singular'),
+        Unit.abbr_plural.label('unit_abbr_plural'),
+        )
+        .select_from(subquery)
+        .join(Unit, isouter=True)
     ).all()
 
 # %%
-print(str(
-    # db.select(Recipe, Ingredient).where(Recipe.id==16)
-    db.select(
+subquery = (db.select(
         Ingredient.item, 
         Ingredient.unit_id,
         db.func.sum(Ingredient.quantity).label('quantity'),
-        db.func.min(Ingredient.order_id).label('order_id'),
+        db.func.min(Ingredient.direction_id * 100 + Ingredient.order_id).label('comb_order_id'),
         )
         .select_from(Recipe)
         .join(Direction)
@@ -97,6 +109,22 @@ print(str(
             Ingredient.item,
             Ingredient.unit_id,
         )
-        .order_by('order_id')
+        .order_by('comb_order_id')
+).subquery()
+
+print(str(
+    # db.select(Recipe, Ingredient).where(Recipe.id==16)
+    db.select(
+        subquery.c.comb_order_id,
+        subquery.c.item,
+        subquery.c.quantity,
+        subquery.c.unit_id,
+        Unit.name,
+        Unit.name_plural,
+        Unit.abbr_singular,
+        Unit.abbr_plural,
+        )
+        .select_from(subquery)
+        .join(Unit, isouter=True)
 ))
 # %%
