@@ -23,23 +23,38 @@ def format_number(value):
     return value
 app.jinja_env.filters['format_number'] = format_number
 
+# helper functions
+def get_midpoint(lst):
+    if isinstance(lst, list):
+        if len(lst) % 2 == 0:
+            midpoint = len(lst) // 2
+        else:
+            midpoint = len(lst) // 2 + 1
+        return midpoint
+
+
 @app.route("/")
 def home():
     recipes = db.session.execute(
         db.select(Recipe).order_by(Recipe.name)
     ).scalars().unique().all()
 
-    if len(recipes) % 2 == 0:
-        midpoint = len(recipes) // 2
-    else:
-        midpoint = len(recipes) // 2 + 1
+    # if len(recipes) % 2 == 0:
+    #     midpoint = len(recipes) // 2
+    # else:
+    #     midpoint = len(recipes) // 2 + 1
+    midpoint = get_midpoint(recipes)
     
-    return render_template("index.html", recipes=recipes, midpoint=midpoint)
+    return render_template(
+        "index.html", 
+        recipes=recipes, 
+        midpoint=midpoint
+        )
 
 # recipe
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def show_recipe(recipe_id):
-    # query database
+    # query database for recipe
     recipe = db.session.execute(
         db.select(Recipe).where(Recipe.id==recipe_id)
     ).scalars().unique().one_or_none()
@@ -79,11 +94,14 @@ def show_recipe(recipe_id):
 
     ingredients = [row._asdict() for row in ingredients_raw]
 
+    midpoint = get_midpoint(ingredients)
+
     if recipe:
         return render_template(
             'recipe.html', 
             recipe=recipe, 
             ingredients=ingredients,
+            midpoint=midpoint,
         )
     else:
         abort(404)

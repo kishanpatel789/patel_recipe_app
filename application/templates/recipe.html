@@ -53,34 +53,68 @@
 
   <div id="ingredients" class="pt-4 ps-1">
     <h2>Ingredients</h2>
-    <div class="row row-cols-1 row-cols-sm-2">
-      {% for item in ingredients %}
-      <div class="col">  
-        <label>
-          <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
-          <span>
-            {{ item.item }}
-            {% if item.quantity %}
-              &ndash;  
-              {{ item.quantity | format_number }} 
-              {% if item.quantity != 1 %}
-                {% if item.unit_abbr_plural %}
-                  {{ item.unit_abbr_plural }}
+    <div class="row">
+
+      <div class="col-12 col-sm-6">
+        {% for item in ingredients[:midpoint] %}
+        <div>
+          <label>
+            <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
+            <span>
+              {{ item.item }}
+              {% if item.quantity %}
+                &ndash;  
+                {{ item.quantity | format_number }} 
+                {% if item.quantity != 1 %}
+                  {% if item.unit_abbr_plural %}
+                    {{ item.unit_abbr_plural }}
+                  {% else %}
+                    {{ item.unit_name_plural }}
+                  {% endif %}
                 {% else %}
-                  {{ item.unit_name_plural }}
-                {% endif %}
-              {% else %}
-                {% if item.unit_abbr_singular %}
-                  {{ item.unit_abbr_singular }}
-                {% else %}
-                  {{ item.unit_name }}
+                  {% if item.unit_abbr_singular %}
+                    {{ item.unit_abbr_singular }}
+                  {% else %}
+                    {{ item.unit_name }}
+                  {% endif %}
                 {% endif %}
               {% endif %}
-            {% endif %}
-          </span>
-        </label>
+            </span>
+          </label>
+        </div>
+        {%endfor%}
       </div>
-      {% endfor %}
+
+      <div class="col-12 col-sm-6">
+        {% for item in ingredients[midpoint:] %}
+        <div>
+          <label>
+            <input class="form-check-input ingredient-checkbox" type="checkbox" value="">
+            <span>
+              {{ item.item }}
+              {% if item.quantity %}
+                &ndash;  
+                {{ item.quantity | format_number }} 
+                {% if item.quantity != 1 %}
+                  {% if item.unit_abbr_plural %}
+                    {{ item.unit_abbr_plural }}
+                  {% else %}
+                    {{ item.unit_name_plural }}
+                  {% endif %}
+                {% else %}
+                  {% if item.unit_abbr_singular %}
+                    {{ item.unit_abbr_singular }}
+                  {% else %}
+                    {{ item.unit_name }}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            </span>
+          </label>
+        </div>
+        {%endfor%}
+      </div>
+
     </div>
   </div>
 
