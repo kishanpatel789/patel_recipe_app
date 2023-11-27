@@ -69,7 +69,7 @@ def show_recipe(recipe_id):
         .select_from(Recipe)
         .join(Direction)
         .join(Ingredient)
-        .where(Recipe.id==16)
+        .where(Recipe.id==recipe_id)
         .group_by(
             Ingredient.item,
             Ingredient.unit_id,
