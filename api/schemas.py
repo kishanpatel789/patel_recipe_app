@@ -9,5 +9,10 @@ class MyBaseModel(BaseModel):
     )
 
 class TagBase(MyBaseModel):
-    id: int
     name: constr(min_length=1)
+
+class TagCreate(TagBase):
+    pass
+
+class TagSchema(TagBase):
+    id: int
