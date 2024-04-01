@@ -1,11 +1,12 @@
 services:
   pgdatabase:
-    image: postgres:15.4
+    image: postgres:16.2
     environment: 
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=prod
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PW}
+      - POSTGRES_DB=${DB_DATABASE}
     volumes:
       - "./pg_data:/var/lib/postgresql/data:rw"
+      - "./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql:ro"
     ports:
       - "5432:5432"
