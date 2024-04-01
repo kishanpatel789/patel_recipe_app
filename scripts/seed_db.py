@@ -1,17 +1,42 @@
 # %%
 from datetime import datetime 
-from pathlib import Path
 import sys
 sys.path.insert(1, '..')
+import os
+from dotenv import load_dotenv
 
-# from config import db
-from application.models import db, User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish
-from application import create_app
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL 
+from sqlalchemy.orm import sessionmaker
+
+from api.models import User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish, metadata_obj
 
 import csv
 
+
 # %%
-app = create_app()
+# load environment variables
+load_dotenv('..')
+DB_USER = os.getenv('DB_USER')
+DB_PW = os.getenv('DB_PW')
+DB_HOST = os.getenv('DB_HOST')
+DB_DATABASE = os.getenv('DB_DATABASE')
+
+
+# %%
+# create sqlalchemy objects
+url = URL.create(
+    drivername='postgresql',
+    username=DB_USER,
+    password=DB_PW,
+    host=DB_HOST,
+    database=DB_DATABASE,
+    port=5432,
+)
+schema_map = {None: 'prod'}
+
+engine = create_engine(url, echo=True).execution_options(schema_translate_map=schema_map) # remove echo=True in prod
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # %%
 seed_map = [
@@ -72,9 +97,9 @@ seed_map_assoc = [
     },
 ]
 # %%
-with app.app_context():
-    db.drop_all()
-    db.create_all()
+with SessionLocal() as db:
+    metadata_obj.drop_all(bind=engine)
+    metadata_obj.create_all(bind=engine)
 
     # models
     for mapper in seed_map:
@@ -97,9 +122,9 @@ with app.app_context():
                 mod_inst_items.append(mod_inst)
 
         for mod_inst in mod_inst_items:
-            db.session.add(mod_inst)
+            db.add(mod_inst)
     
-    db.session.commit()
+    db.commit()
 
     # association tables
     for mapper in seed_map_assoc:
@@ -111,9 +136,9 @@ with app.app_context():
                 print(row)
                 records.append(row)
         multiple_insert = mapper['tbl'].insert().values(records)
-        db.session.execute(multiple_insert)
+        db.execute(multiple_insert)
 
-    db.session.commit()
+    db.commit()
 
 
 # %%

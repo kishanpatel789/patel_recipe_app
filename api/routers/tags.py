@@ -52,7 +52,7 @@ def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db
   return tag_orm
 
 @router.put("/{id}", response_model=schemas.TagSchema)
-def update_permission(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db)):
+def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db)):
   
   # check for existing tag
   existing_tag = db.execute(
