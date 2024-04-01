@@ -15,7 +15,7 @@ router = APIRouter(
 @router.get("/", response_model=list[schemas.TagSchema])
 def read_tags(db: Session = Depends(get_db)):
   tag_orms = db.execute(
-    select(models.Tag).order_by(models.Tag.name)
+    select(models.Tag).where(models.Tag.is_active==True).order_by(models.Tag.name)
   ).scalars().unique().all()
 
   return tag_orms
@@ -24,7 +24,7 @@ def read_tags(db: Session = Depends(get_db)):
 def read_tag(id: int, db: Session = Depends(get_db)):
 
   tag_orm = db.execute(
-    select(models.Tag).filter(models.Tag.id == id)
+    select(models.Tag).where(models.Tag.is_active==True).where(models.Tag.id==id)
   ).unique().scalar_one_or_none()
   if not tag_orm:
     raise HTTPException(status_code=404, detail=f"Tag '{id}' not found")
@@ -36,7 +36,9 @@ def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db
   
   # check for existing tag
   existing_tag = db.execute(
-    select(models.Tag).filter(models.Tag.name == tag_schema_input.name)
+    select(models.Tag).where(models.Tag.is_active==True).where(
+      models.Tag.name==tag_schema_input.name
+    )
   ).unique().scalar_one_or_none()
   if existing_tag:
     raise HTTPException(status_code=409, detail=f"Tag '{tag_schema_input.name}' with id '{existing_tag.id}' already exists")
@@ -56,7 +58,7 @@ def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depen
   
   # check for existing tag
   existing_tag = db.execute(
-    select(models.Tag).filter(models.Tag.id == id)
+    select(models.Tag).where(models.Tag.is_active==True).where(models.Tag.id==id)
   ).unique().scalar_one_or_none()
   if not existing_tag:
     raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
@@ -64,7 +66,9 @@ def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depen
   # check input schema tag name doesn't already exist on another record
   if existing_tag.name != tag_schema_input.name:
     conflicting_tag = db.execute(
-      select(models.Tag).filter(models.Tag.name == tag_schema_input.name)
+      select(models.Tag).where(models.Tag.is_active==True).where(
+        models.Tag.name==tag_schema_input.name
+      )
     ).unique().scalar_one_or_none()
     if conflicting_tag:
       raise HTTPException(status_code=400, detail=f"Tag '{tag_schema_input.name}' with id '{conflicting_tag.id}' already exists. Cannot update tag '{id}'.")
@@ -77,3 +81,23 @@ def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depen
   db.refresh(existing_tag)
 
   return existing_tag
+
+@router.delete("/{id}", response_model=schemas.TagSchema)
+def delete_tag(id: int, db: Session = Depends(get_db)):
+  
+  # check for existing tag
+  existing_tag = db.execute(
+    select(models.Tag).where(models.Tag.is_active==True).where(models.Tag.id==id)
+  ).unique().scalar_one_or_none()
+  if not existing_tag:
+    raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
+
+  # make existing tag inactive
+  existing_tag.is_active = False
+
+  # update db
+  db.commit()
+  db.refresh(existing_tag)
+
+  return existing_tag
+
