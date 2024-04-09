@@ -6,13 +6,15 @@ class MyBaseModel(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         str_strip_whitespace=True,
+        str_min_length=1,
     )
 
 class TagBase(MyBaseModel):
-    name: constr(min_length=1)
+    name: str
 
 class TagCreate(TagBase):
     pass
 
 class TagSchema(TagBase):
     id: int
+    is_active: bool

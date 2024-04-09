@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
+from sqlalchemy.sql.selectable import Select # for typing
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from typing import Type
 
 from .. import models, schemas
 from ..database import get_db
@@ -11,20 +14,36 @@ router = APIRouter(
   tags=["tags"],
 )
 
+# helper functions
+def modify_query_for_activity(model: Type[DeclarativeMeta], query: Select, active_only: bool):
+  if active_only:
+    return query.where(model.is_active==True)
+  else:
+    return query
+
+
 # tag endpoints
 @router.get("/", response_model=list[schemas.TagSchema])
-def read_tags(db: Session = Depends(get_db)):
+def read_tags(active_only: bool = True, db: Session = Depends(get_db)):
+
+  base_query = select(models.Tag).order_by(models.Tag.name)
+  finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
+
   tag_orms = db.execute(
-    select(models.Tag).where(models.Tag.is_active==True).order_by(models.Tag.name)
+    finished_query
   ).scalars().unique().all()
 
   return tag_orms
 
 @router.get("/{id}", response_model=schemas.TagSchema)
-def read_tag(id: int, db: Session = Depends(get_db)):
+def read_tag(id: int, active_only: bool = True, db: Session = Depends(get_db)):
+
+  base_query = select(models.Tag).where(models.Tag.id==id)
+  finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
+
 
   tag_orm = db.execute(
-    select(models.Tag).where(models.Tag.is_active==True).where(models.Tag.id==id)
+    finished_query
   ).unique().scalar_one_or_none()
   if not tag_orm:
     raise HTTPException(status_code=404, detail=f"Tag '{id}' not found")
