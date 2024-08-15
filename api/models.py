@@ -47,6 +47,7 @@ class Recipe(Base):
     __tablename__ = "recipe"
     id = mapped_column(Integer, primary_key=True)
     name = mapped_column(String, unique=True, nullable=False)
+    slug = mapped_column(String, unique=True, nullable=False)
     date_created = mapped_column(
         DateTime, default=datetime.now(UTC), nullable=False
     )

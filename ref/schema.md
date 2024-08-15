@@ -5,6 +5,7 @@
 | ------------- | ---- | :------: | :----: | -------- |
 | id            | int  |          |   1    |          |
 | name          | str  |          |   1    |          |
+| slug          | str  |          |   1    |          |
 | date_created  | dt   |          |        |          |
 | date_modified | dt   |    1     |        |          |
 | created_by    | int  |          |        | User(id) |

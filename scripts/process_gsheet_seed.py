@@ -1,10 +1,9 @@
 # %%
-from datetime import datetime 
-from pathlib import Path
 import sys
 sys.path.insert(1, '..')
 
 import csv
+import re
 
 # %%
 # define global variables
@@ -20,6 +19,7 @@ PATH_COMPLEMENTARYDISH_TMP = '../seed_data/data_complementarydish_tmp.csv'
 FIELD_NAMES_RECIPE = [
     'id',
     'name',
+    'slug',
     'date_created',
     'date_modified',
     'created_by',
@@ -125,11 +125,13 @@ with open(PATH_GSHEET_CSV, newline='\n') as csvfile_gsheet:
             print(f"Beginning new recipe: {recipe_name}")
             recipe_id += 1
             direction_order_id = 0
+            recipe_slug = re.sub(r'[^\w\s]', '', recipe_name).replace(' ', '-').lower()
             with open(PATH_RECIPE_CSV, 'a', newline='\n') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=FIELD_NAMES_RECIPE)
                 writer.writerow({
                     'id': recipe_id,
                     'name': recipe_name,
+                    'slug': recipe_slug,
                     'created_by': 1,
                 })
 
