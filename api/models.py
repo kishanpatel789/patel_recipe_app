@@ -8,10 +8,6 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.types import DateTime
 
 
-
-
-
-
 metadata_obj = MetaData(schema=None)
 
 class Base(DeclarativeBase):

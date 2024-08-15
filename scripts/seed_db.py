@@ -2,41 +2,11 @@
 from datetime import datetime 
 import sys
 sys.path.insert(1, '..')
-import os
-from dotenv import load_dotenv
-
-from sqlalchemy import create_engine
-from sqlalchemy.engine import URL 
-from sqlalchemy.orm import sessionmaker
 
 from api.models import User, Recipe, Tag, recipe_tag, Unit, Ingredient, Direction, complementary_dish, metadata_obj
+from api.database import engine, SessionLocal
 
 import csv
-
-
-# %%
-# load environment variables
-load_dotenv('..')
-DB_USER = os.getenv('DB_USER')
-DB_PW = os.getenv('DB_PW')
-DB_HOST = os.getenv('DB_HOST')
-DB_DATABASE = os.getenv('DB_DATABASE')
-
-
-# %%
-# create sqlalchemy objects
-url = URL.create(
-    drivername='postgresql',
-    username=DB_USER,
-    password=DB_PW,
-    host=DB_HOST,
-    database=DB_DATABASE,
-    port=5432,
-)
-schema_map = {None: 'prod'}
-
-engine = create_engine(url, echo=True).execution_options(schema_translate_map=schema_map) # remove echo=True in prod
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # %%
 seed_map = [

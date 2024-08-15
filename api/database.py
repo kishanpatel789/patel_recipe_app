@@ -1,24 +1,12 @@
 from sqlalchemy import create_engine
-from sqlalchemy.engine import URL 
 from sqlalchemy.orm import sessionmaker
-
-from fastapi import HTTPException
+from pathlib import Path
 
 from .config import config_data
 
+url = f"sqlite:///{config_data['db_path']}"
 
-url = URL.create(
-    drivername="postgresql",
-    username=config_data["username"],
-    password=config_data["password"],
-    host=config_data["host"],
-    database=config_data["database"],
-    port=5432,
-)
-
-schema_map = {None: config_data["schema"]}
-
-engine = create_engine(url, echo=True).execution_options(schema_translate_map=schema_map) # remove echo=True in prod
+engine = create_engine(url, echo=True) # remove echo=True in prod
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
