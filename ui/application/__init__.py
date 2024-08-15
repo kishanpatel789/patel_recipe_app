@@ -1,16 +1,11 @@
 from flask import Flask
-import pathlib
-
-basedir = pathlib.Path(__file__).parents[1].resolve()
-
-
+from .config import Config
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_pyfile(f"{basedir / 'config.py'}")
 
-    from .models import db
-    db.init_app(app)
+    # read config json
+    app.config.from_object(Config)
 
     with app.app_context():
         # Include our Routes
@@ -19,3 +14,4 @@ def create_app():
         # Register Blueprints
 
         return app
+
