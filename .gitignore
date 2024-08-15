@@ -12,3 +12,4 @@ stylesheet_brynna.css
 .DS_Store
 static_site*
 config.json
+*.swp
