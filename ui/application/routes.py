@@ -59,7 +59,6 @@ def call_api(endpoint, method='GET', payload=None):
 
 @app.route("/")
 def home():
-    return "here we are"
     # recipes = db.session.execute(
     #     db.select(Recipe).order_by(Recipe.name)
     # ).scalars().unique().all()
@@ -70,11 +69,11 @@ def home():
     # #     midpoint = len(recipes) // 2 + 1
     # midpoint = get_midpoint(recipes)
     
-    # return render_template(
-    #     "index.html", 
-    #     recipes=recipes, 
-    #     midpoint=midpoint
-    #     )
+    return render_template(
+        "index.html", 
+        # recipes=recipes, 
+        # midpoint=midpoint
+        )
 
 # # recipe
 # @app.route('/recipe/<int:recipe_id>', methods=['GET'])
@@ -360,16 +359,14 @@ def show_tags():
     # query database
     r_status, tags = call_api("tags/")
 
-    return tags
-
     # # prepare/process form
     # form = TagForm()
 
-    # return render_template(
-    #     'tag.html', 
-    #     tags=tags, 
-    #     form=form,
-    # )
+    return render_template(
+        'tag.html', 
+        tags=tags, 
+        # form=form,
+    )
 
 # @app.route('/tag/new', methods=['POST'])
 # def create_tag():
