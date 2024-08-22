@@ -7,13 +7,24 @@
   
   <div id="tags">
   {% if tags %}
-    <ul>
-      {% for tag in tags %}
-        <li>
-          {{tag.name}}
-        </li>
-      {% endfor %}
-    </ul>
+    <table>
+      <thead>
+        <th>Tag</th>
+        <th>Is Active</th>
+        <th></th>
+        <th></th>
+      </thead>
+      <tbody>
+        {% for tag in tags %}
+          <tr>
+            <td>{{tag.name}}</td>
+            <td>{{tag.is_active}}</td>
+            <td>edit</td>
+            <td>delete</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% else %}
     <span>No tags found.</span>
   {%endif%}

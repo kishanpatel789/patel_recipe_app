@@ -357,7 +357,7 @@ def home():
 @app.route('/tag', methods=['GET'])
 def show_tags():
     # query database
-    r_status, tags = call_api("tags/")
+    r_status, tags = call_api("tags/?active_only=false")
 
     # # prepare/process form
     # form = TagForm()
