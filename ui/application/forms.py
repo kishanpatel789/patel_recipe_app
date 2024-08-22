@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 import wtforms
-from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList, SelectField
+from wtforms import StringField, SubmitField, IntegerField, FloatField, FormField, FieldList, SelectField, BooleanField
 from wtforms.validators import DataRequired, Length, InputRequired, Optional
 
 def strip_whitespace(s):
@@ -58,6 +58,12 @@ class TagForm(BaseForm):
         # filters=[
         #     strip_whitespace
         # ]
+    )
+    is_active = BooleanField(
+        'Is Active',
+        validators=[
+            InputRequired()
+        ],
     )
     
     submit = SubmitField('Submit')

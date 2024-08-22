@@ -357,7 +357,7 @@ def home():
 @app.route('/tag', methods=['GET'])
 def show_tags():
     # query database
-    r_status, tags = call_api("tags/?active_only=false")
+    r_status, tags = call_api("tags")
 
     # # prepare/process form
     # form = TagForm()
@@ -367,6 +367,27 @@ def show_tags():
         tags=tags, 
         # form=form,
     )
+
+@app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
+def edit_tag(tag_id):
+    # look up tag_id
+    r_status, existing_tag = call_api(f"tags/{tag_id}")
+
+    return f"Tag with ID '{tag_id}' does not exist", "error"
+
+    # if not existing_tag:
+    #     flash(f"Tag with ID '{tag_id}' does not exist", "error")
+    # else:
+    #     # populate form submitted form info or with existing info
+    #     form = TagForm(obj=existing_tag) 
+        
+    #     # store form content 
+    #     if form.validate_on_submit():
+    #         if existing_tag:
+    #             form.populate_obj(existing_tag)
+    #             db.session.commit()      
+    # return redirect(url_for("show_tags"))
+
 
 # @app.route('/tag/new', methods=['POST'])
 # def create_tag():
@@ -394,25 +415,6 @@ def show_tags():
 
 #     return redirect(url_for("show_tags"))
         
-# @app.route('/tag/edit/<int:tag_id>', methods=['POST'])
-# def edit_tag(tag_id):
-#     # look up tag_id
-#     existing_tag = db.session.execute(
-#         db.select(Tag).where(Tag.id==tag_id)
-#     ).scalars().one_or_none()
-
-#     if not existing_tag:
-#         flash(f"Tag with ID '{tag_id}' does not exist", "error")
-#     else:
-#         # populate form submitted form info or with existing info
-#         form = TagForm(obj=existing_tag) 
-        
-#         # store form content 
-#         if form.validate_on_submit():
-#             if existing_tag:
-#                 form.populate_obj(existing_tag)
-#                 db.session.commit()      
-#     return redirect(url_for("show_tags"))
 
 
 # @app.route('/tag/delete/<int:tag_id>', methods=['GET'])

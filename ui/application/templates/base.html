@@ -17,6 +17,17 @@
 
 <body class="flex flex-col h-screen">
   <header class="bg-white">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div>
+        {% for message in messages %}
+          <div>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% endwith %}
   </header>
   <main class="grow">
     {% block main %}
