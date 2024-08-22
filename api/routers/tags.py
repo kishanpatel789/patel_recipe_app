@@ -24,7 +24,7 @@ def modify_query_for_activity(model: Type[DeclarativeMeta], query: Select, activ
 
 # tag endpoints
 @router.get("/", response_model=list[schemas.TagSchema])
-def read_tags(active_only: bool = True, db: Session = Depends(get_db)):
+def read_tags(active_only: bool = False, db: Session = Depends(get_db)):
 
   base_query = select(models.Tag).order_by(models.Tag.name)
   finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
@@ -36,7 +36,7 @@ def read_tags(active_only: bool = True, db: Session = Depends(get_db)):
   return tag_orms
 
 @router.get("/{id}", response_model=schemas.TagSchema)
-def read_tag(id: int, active_only: bool = True, db: Session = Depends(get_db)):
+def read_tag(id: int, active_only: bool = False, db: Session = Depends(get_db)):
 
   base_query = select(models.Tag).where(models.Tag.id==id)
   finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
