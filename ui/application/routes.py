@@ -357,7 +357,7 @@ def home():
 @app.route('/tag', methods=['GET'])
 def show_tags():
     # query database
-    r_status, tags = call_api("tags")
+    r_status, tags = call_api('tags')
 
     # # prepare/process form
     # form = TagForm()
@@ -373,7 +373,13 @@ def edit_tag(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
 
-    return f"Tag with ID '{tag_id}' does not exist", "error"
+    form = TagForm(data=existing_tag)
+
+    return render_template(
+       'edit_tag.html',
+       form=form,
+    #    tag=existing_tag,
+       )
 
     # if not existing_tag:
     #     flash(f"Tag with ID '{tag_id}' does not exist", "error")
