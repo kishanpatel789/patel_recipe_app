@@ -2,7 +2,7 @@
     <td>{{form.name()}}</td>
     <td>{{form.is_active()}}</td>
     <td>
-      <button hx-get="/tag/{{form.id.data}}">
+      <button hx-get="{{url_for('return_tag_row', tag_id=form.id.data)}}">
         cancel
       </button>
       <button>

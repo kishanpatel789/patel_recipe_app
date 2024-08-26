@@ -354,7 +354,7 @@ def home():
     
 
 # tag
-@app.route('/tag', methods=['GET'])
+@app.get('/tag')
 def show_tags():
     # query database
     r_status, tags = call_api('tags')
@@ -368,7 +368,7 @@ def show_tags():
         # form=form,
     )
 
-@app.route('/tag/<int:tag_id>', methods=['GET'])
+@app.get('/tag/<int:tag_id>')
 def return_tag_row(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -383,7 +383,7 @@ def return_tag_row(tag_id):
     )
 
 
-@app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
+@app.get('/tag/<int:tag_id>/edit')
 def return_tag_row_edit(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
