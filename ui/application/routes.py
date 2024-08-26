@@ -368,15 +368,30 @@ def show_tags():
         # form=form,
     )
 
+@app.route('/tag/<int:tag_id>', methods=['GET'])
+def return_tag_row(tag_id):
+    # look up tag_id
+    r_status, existing_tag = call_api(f"tags/{tag_id}")
+
+    # # prepare/process form
+    # form = TagForm()
+
+    return render_template(
+        'tag_row.html', 
+        tag=existing_tag, 
+        # form=form,
+    )
+
+
 @app.route('/tag/edit/<int:tag_id>', methods=['GET', 'POST'])
-def edit_tag(tag_id):
+def return_tag_row_edit(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
 
     form = TagForm(data=existing_tag)
 
     return render_template(
-       'edit_tag.html',
+       'tag_row_edit.html',
        form=form,
     #    tag=existing_tag,
        )

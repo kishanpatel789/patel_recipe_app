@@ -2,9 +2,11 @@
     <td>{{form.name()}}</td>
     <td>{{form.is_active()}}</td>
     <td>
-      cancel
-    </td>
-    <td>
-      save
+      <button hx-get="/tag/{{form.id.data}}">
+        cancel
+      </button>
+      <button>
+        save
+      </button>
     </td>
   </tr>
