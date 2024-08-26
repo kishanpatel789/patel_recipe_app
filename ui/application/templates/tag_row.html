@@ -2,7 +2,7 @@
     <td>{{tag.name}}</td>
     <td>{{tag.is_active}}</td>
     <td>
-      <button hx-get="{{url_for('return_tag_row_edit', tag_id=tag.id)}}">
+      <button hx-get="{{url_for('get_tag_row_edit', tag_id=tag.id)}}">
         edit
       </button>
     </td>

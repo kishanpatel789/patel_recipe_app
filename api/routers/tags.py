@@ -73,11 +73,11 @@ def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db
   return tag_orm
 
 @router.put("/{id}", response_model=schemas.TagSchema)
-def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db)):
+def update_tag(id: int, tag_schema_input: schemas.TagEdit, db: Session = Depends(get_db)):
   
   # check for existing tag
   existing_tag = db.execute(
-    select(models.Tag).where(models.Tag.is_active==True).where(models.Tag.id==id)
+    select(models.Tag).where(models.Tag.id==id)
   ).unique().scalar_one_or_none()
   if not existing_tag:
     raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
@@ -85,15 +85,21 @@ def update_tag(id: int, tag_schema_input: schemas.TagCreate, db: Session = Depen
   # check input schema tag name doesn't already exist on another record
   if existing_tag.name != tag_schema_input.name:
     conflicting_tag = db.execute(
-      select(models.Tag).where(models.Tag.is_active==True).where(
+      select(models.Tag).where(
         models.Tag.name==tag_schema_input.name
       )
     ).unique().scalar_one_or_none()
     if conflicting_tag:
       raise HTTPException(status_code=400, detail=f"Tag '{tag_schema_input.name}' with id '{conflicting_tag.id}' already exists. Cannot update tag '{id}'.")
 
-  # update attributes on existing tag
-  existing_tag.name = tag_schema_input.name
+  # # create model instance
+  # tag_orm_new = models.Tag(id=id, **tag_schema_input.model_dump())
+
+  # # update attributes on existing tag
+  # for key in tag_orm_new.__mapper__.attrs.keys():
+  #   setattr(existing_tag, key, getattr(tag_orm_new, key))
+  for key, value in tag_schema_input.model_dump().items():
+    setattr(existing_tag, key, value)
 
   # update db
   db.commit()

@@ -15,6 +15,8 @@ class TagBase(MyBaseModel):
 class TagCreate(TagBase):
     pass
 
-class TagSchema(TagBase):
-    id: int
+class TagEdit(TagBase):
     is_active: bool
+
+class TagSchema(TagEdit):
+    id: int

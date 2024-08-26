@@ -52,7 +52,8 @@ def call_api(endpoint, method='GET', payload=None):
   r_status = r.status_code
   if r_status >= 400:
     flash(f"Error {r_status}: {r_dict['detail']}")
-  # r.raise_for_status()
+    print(f"Error {r_status}: {r_dict['detail']}")
+#   r.raise_for_status()
 
   return r_status, r_dict
 
@@ -369,7 +370,7 @@ def show_tags():
     )
 
 @app.get('/tag/<int:tag_id>')
-def return_tag_row(tag_id):
+def get_tag_row(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
 
@@ -384,7 +385,7 @@ def return_tag_row(tag_id):
 
 
 @app.get('/tag/<int:tag_id>/edit')
-def return_tag_row_edit(tag_id):
+def get_tag_row_edit(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
 
@@ -393,7 +394,7 @@ def return_tag_row_edit(tag_id):
     return render_template(
        'tag_row_edit.html',
        form=form,
-    #    tag=existing_tag,
+       tag_id=tag_id,
        )
 
     # if not existing_tag:
@@ -408,6 +409,36 @@ def return_tag_row_edit(tag_id):
     #             form.populate_obj(existing_tag)
     #             db.session.commit()      
     # return redirect(url_for("show_tags"))
+
+@app.put('/tag/<int:tag_id>')
+def put_tag_row(tag_id):
+    # look up tag_id
+    # r_status, existing_tag = call_api(f"tags/{tag_id}")
+
+    # get data from request
+    form = TagForm()
+    print(dir(form))
+    print(form.data)
+
+    # update data in db
+    r_status, updated_tag = call_api(
+        f"tags/{tag_id}", 
+        method='PUT',
+        payload=form.data
+    )
+    
+    # return regular tag row
+    # flash error as needed
+
+
+
+    # # prepare/process form
+    # form = TagForm()
+
+    return render_template(
+        'tag_row.html', 
+        tag=updated_tag, 
+    )
 
 
 # @app.route('/tag/new', methods=['POST'])
