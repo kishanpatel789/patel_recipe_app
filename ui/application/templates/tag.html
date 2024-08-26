@@ -16,16 +16,7 @@
       </thead>
       <tbody hx-target="closest tr" hx-swap="outerHTML">
         {% for tag in tags %}
-          <tr>
-            <td>{{tag.name}}</td>
-            <td>{{tag.is_active}}</td>
-            <td>
-              <button hx-get="/tag/edit/{{tag.id}}">
-                edit
-              </button>
-            </td>
-            <td>delete</td>
-          </tr>
+          {% include 'tag_row.html' %}
         {% endfor %}
       </tbody>
     </table>
