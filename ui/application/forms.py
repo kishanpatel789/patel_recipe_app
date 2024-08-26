@@ -46,9 +46,9 @@ class BaseForm(FlaskForm):
 
 class TagForm(BaseForm):
     """Tag form."""
-    id = IntegerField(
-        'Id',
-    )
+    # id = IntegerField(
+    #     'Id',
+    # )
     name = StringField(
         'Tag Name',
         validators=[

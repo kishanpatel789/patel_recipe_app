@@ -1,11 +1,11 @@
 <tr>
-    <td>{{form.name()}}</td>
-    <td>{{form.is_active()}}</td>
+    <td>{{ form.name() }}</td>
+    <td>{{ form.is_active() }}</td>
     <td>
-      <button hx-get="{{url_for('return_tag_row', tag_id=form.id.data)}}">
+      <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
         cancel
       </button>
-      <button>
+      <button hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}" hx-include="closest tr">
         save
       </button>
     </td>
