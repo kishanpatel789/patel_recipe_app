@@ -7,19 +7,9 @@
   
   <div id="tags">
   {% if tags %}
-    <table>
-      <thead>
-        <th>Tag</th>
-        <th>Is Active</th>
-        <th></th>
-        <th></th>
-      </thead>
-      <tbody hx-target="closest tr" hx-swap="outerHTML">
-        {% for tag in tags %}
-          {% include 'tag_row.html' %}
-        {% endfor %}
-      </tbody>
-    </table>
+    {% for tag in tags %}
+      {% include 'tag_row.html' %}
+    {% endfor %}
   {% else %}
     <span>No tags found.</span>
   {%endif%}

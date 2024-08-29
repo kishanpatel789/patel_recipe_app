@@ -1,12 +1,21 @@
-<tr>
-    <td>{{ form.name() }}</td>
-    <td>{{ form.is_active() }}</td>
-    <td>
-      <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
-        cancel
-      </button>
-      <button hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}" hx-include="closest tr">
-        {{ form.submit() }}
-      </button>
-    </td>
-  </tr>
+<div hx-target="this" hx-swap="outerHTML">
+  <span>{{ form.name() }}</span>
+  <span>{{ form.is_active() }}</span>
+  <span>
+    <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
+      cancel
+    </button>
+    <button>
+      {{ form.submit() }}
+    </button>
+    {{ form.csrf_token }}
+    <form id="form-tag-{{tag_id}}" hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}"></form>
+  </span>
+  {% if form.name.errors %}
+    <ul class="errors">
+        {% for error in form.name.errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+  {% endif %}
+</div>

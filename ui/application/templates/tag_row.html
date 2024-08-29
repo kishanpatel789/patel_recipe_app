@@ -1,9 +1,9 @@
-<tr>
-    <td>{{tag.name}}</td>
-    <td>{{tag.is_active}}</td>
-    <td>
+<div hx-target="this" hx-swap="outerHTML">
+    <span>{{tag.name}}</span>
+    <span>{{tag.is_active}}</span>
+    <span>
       <button hx-get="{{url_for('get_tag_row_edit', tag_id=tag.id)}}">
         edit
       </button>
-    </td>
-</tr>
+    </span>
+</div>
