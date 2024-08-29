@@ -66,7 +66,7 @@ class TagForm(BaseForm):
         ],
     )
     
-    submit = SubmitField('Submit')
+    submit = SubmitField('Save')
 
 class UnitForm(BaseForm):
     """Unit form."""

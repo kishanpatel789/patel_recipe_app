@@ -6,7 +6,7 @@
         cancel
       </button>
       <button hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}" hx-include="closest tr">
-        save
+        {{ form.submit() }}
       </button>
     </td>
   </tr>
