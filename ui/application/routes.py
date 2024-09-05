@@ -430,6 +430,7 @@ def put_tag_row(tag_id):
         )
     else:
        print(form.errors)
+       print(form.data)
        return render_template(
             'tag_row_edit.html',
             form=form,

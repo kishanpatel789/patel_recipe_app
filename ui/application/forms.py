@@ -12,20 +12,28 @@ def strip_whitespace(s):
         return s.strip()
     return s
 
-# def read_none(x):
-#     return x or None
+def read_none(x):
+    return x or None
 
+def read_boolean(b):
+    if b:
+        return bool(b)
+    else:
+        return False
 
 
 class Meta:
     @staticmethod
     def bind_field(form, unbound_field, options):
         filters = unbound_field.kwargs.get('filters', [])
-        if not issubclass(unbound_field.field_class, FieldList):
-            if strip_whitespace not in filters:
-                filters.append(strip_whitespace)
-#             # if read_none not in filters:
-#             #     filters.append(read_none)
+        # if not issubclass(unbound_field.field_class, FieldList):
+        if strip_whitespace not in filters:
+            filters.append(strip_whitespace)
+        if issubclass(unbound_field.field_class, StringField) and read_none not in filters:
+            filters.append(read_none)
+        if issubclass(unbound_field.field_class, BooleanField) and read_boolean not in filters:
+            filters.append(read_boolean)
+
         return unbound_field.bind(form=form, filters=filters, **options)
 
 class BaseFormUnsecure(wtforms.Form): # used for form field
@@ -60,9 +68,7 @@ class TagForm(BaseForm):
     )
     is_active = BooleanField(
         'Is Active',
-        validators=[
-            InputRequired(message='Tag must be active or not active')
-        ],
+        validators=[],
     )
     
     # submit = SubmitField('Save')
