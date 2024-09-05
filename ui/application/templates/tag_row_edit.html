@@ -1,16 +1,18 @@
 <div hx-target="this" hx-swap="outerHTML">
-  <span>{{ form.name() }}</span>
-  <span>{{ form.is_active() }}</span>
-  <span>
-    <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
-      cancel
-    </button>
-    <button>
-      {{ form.submit() }}
-    </button>
+  <form id="form-tag-{{tag_id}}">
     {{ form.csrf_token }}
-    <form id="form-tag-{{tag_id}}" hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}"></form>
-  </span>
+    <span>{{ form.name() }}</span>
+    <span>{{ form.is_active() }}</span>
+    <span>
+      <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
+        cancel
+      </button>
+      <button hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}">
+        save
+      </button>
+    </span>
+  </form>
+
   {% if form.name.errors %}
     <ul class="errors">
         {% for error in form.name.errors %}
