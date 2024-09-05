@@ -1,8 +1,23 @@
 <div hx-target="this" hx-swap="outerHTML">
   <form id="form-tag-{{tag_id}}">
     {{ form.csrf_token }}
-    <span>{{ form.name() }}</span>
-    <span>{{ form.is_active() }}</span>
+    <span>
+      {{ form.name() }}
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          <br><span>{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </span>
+    <span>
+      {{ form.is_active() }}
+      {% if form.is_active.errors %}
+        {% for error in form.is_active.errors %}
+          <br><span>{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+
+    </span>
     <span>
       <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
         cancel
@@ -12,12 +27,3 @@
       </button>
     </span>
   </form>
-
-  {% if form.name.errors %}
-    <ul class="errors">
-        {% for error in form.name.errors %}
-            <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-  {% endif %}
-</div>

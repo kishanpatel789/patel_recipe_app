@@ -420,21 +420,24 @@ def put_tag_row(tag_id):
     print(dir(form))
     print(form.data)
 
-    # update data in db
-    r_status, updated_tag = call_api(
-        f"tags/{tag_id}", 
-        method='PUT',
-        payload=form.data
-    )
+    if form.validate_on_submit():
+
+        # update data in db
+        r_status, updated_tag = call_api(
+            f"tags/{tag_id}", 
+            method='PUT',
+            payload=form.data
+        )
+    else:
+       print(form.errors)
+       return render_template(
+            'tag_row_edit.html',
+            form=form,
+            tag_id=tag_id,
+        )
+
+    print('updated_tag HERE:', updated_tag)
     
-    # return regular tag row
-    # flash error as needed
-
-
-
-    # # prepare/process form
-    # form = TagForm()
-
     return render_template(
         'tag_row.html', 
         tag=updated_tag, 

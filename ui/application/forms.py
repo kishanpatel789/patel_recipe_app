@@ -12,8 +12,8 @@ def strip_whitespace(s):
         return s.strip()
     return s
 
-def read_none(x):
-    return x or None
+# def read_none(x):
+#     return x or None
 
 
 
@@ -24,8 +24,8 @@ class Meta:
         if not issubclass(unbound_field.field_class, FieldList):
             if strip_whitespace not in filters:
                 filters.append(strip_whitespace)
-            if read_none not in filters:
-                filters.append(read_none)
+#             # if read_none not in filters:
+#             #     filters.append(read_none)
         return unbound_field.bind(form=form, filters=filters, **options)
 
 class BaseFormUnsecure(wtforms.Form): # used for form field
@@ -52,8 +52,7 @@ class TagForm(BaseForm):
     name = StringField(
         'Tag Name',
         validators=[
-            InputRequired(),
-            Length(min=1, max=20)
+            Length(min=1, max=20, message='Tag must have a name between 1 and 20 characters long')
         ],
         # filters=[
         #     strip_whitespace
@@ -62,11 +61,11 @@ class TagForm(BaseForm):
     is_active = BooleanField(
         'Is Active',
         validators=[
-            InputRequired()
+            InputRequired(message='Tag must be active or not active')
         ],
     )
     
-    submit = SubmitField('Save')
+    # submit = SubmitField('Save')
 
 class UnitForm(BaseForm):
     """Unit form."""
