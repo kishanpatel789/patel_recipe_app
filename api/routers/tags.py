@@ -55,7 +55,7 @@ def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db
   
   # check for existing tag
   existing_tag = db.execute(
-    select(models.Tag).where(models.Tag.is_active==True).where(
+    select(models.Tag).where(
       models.Tag.name==tag_schema_input.name
     )
   ).unique().scalar_one_or_none()
