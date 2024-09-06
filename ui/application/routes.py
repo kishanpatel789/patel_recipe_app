@@ -397,19 +397,6 @@ def get_tag_row_edit(tag_id):
        tag_id=tag_id,
        )
 
-    # if not existing_tag:
-    #     flash(f"Tag with ID '{tag_id}' does not exist", "error")
-    # else:
-    #     # populate form submitted form info or with existing info
-    #     form = TagForm(obj=existing_tag) 
-        
-    #     # store form content 
-    #     if form.validate_on_submit():
-    #         if existing_tag:
-    #             form.populate_obj(existing_tag)
-    #             db.session.commit()      
-    # return redirect(url_for("show_tags"))
-
 @app.put('/tag/<int:tag_id>')
 def put_tag_row(tag_id):
     # look up tag_id
@@ -444,6 +431,23 @@ def put_tag_row(tag_id):
         tag=updated_tag, 
     )
 
+@app.get('/tag/new')
+def get_tag_row_new():
+
+    form = TagForm()
+
+    return render_template(
+       'tag_row_new.html',
+       form=form,
+    )
+
+@app.get('/tag/button/new')
+def get_new_tag_button():
+   return render_template('tag_button_new.html')
+
+@app.post('/tag/new')
+def create_tag():
+   pass
 
 # @app.route('/tag/new', methods=['POST'])
 # def create_tag():

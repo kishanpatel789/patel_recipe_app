@@ -19,10 +19,10 @@
 
     </span>
     <span>
-      <button hx-get="{{url_for('get_tag_row', tag_id=tag_id)}}">
+      <button hx-get="{{url_for('get_new_tag_button')}}">
         cancel
       </button>
-      <button hx-put="{{url_for('put_tag_row', tag_id=tag_id)}}">
+      <button hx-post="{{url_for('create_tag')}}">
         save
       </button>
     </span>
