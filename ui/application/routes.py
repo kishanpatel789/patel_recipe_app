@@ -447,7 +447,31 @@ def get_new_tag_button():
 
 @app.post('/tag/new')
 def create_tag():
-   pass
+    form = TagForm(is_active=True)
+
+    if form.validate_on_submit():
+
+        # update data in db
+        r_status, new_tag = call_api(
+            f"tags", 
+            method='POST',
+            payload=form.data
+        )
+    else:
+       print(form.errors)
+       print(form.data)
+       return render_template(
+            'tag_row_NEW.html',
+            form=form,
+        )
+
+    print('new_tag HERE:', new_tag)
+    
+    return render_template(
+        'tag_row.html', 
+        tag=new_tag, 
+    )
+
 
 # @app.route('/tag/new', methods=['POST'])
 # def create_tag():
