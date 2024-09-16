@@ -5,11 +5,11 @@ recipe.db
 seed_data/
 *.png
 .env
-pg_data
-scratch.txt
+scratch*.txt
 application/static/bootstrap*
 stylesheet_brynna.css
 .DS_Store
 static_site*
 config.json
 *.swp
+.python-version
