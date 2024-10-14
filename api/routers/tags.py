@@ -8,21 +8,12 @@ from typing import Type
 
 from .. import models, schemas
 from ..database import get_db
+from .common import modify_query_for_activity
 
 router = APIRouter(
     prefix="/tags",
     tags=["tags"],
 )
-
-
-# helper functions
-def modify_query_for_activity(
-    model: Type[DeclarativeMeta], query: Select, active_only: bool
-):
-    if active_only:
-        return query.where(model.is_active == True)
-    else:
-        return query
 
 
 # tag endpoints
