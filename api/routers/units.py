@@ -2,9 +2,6 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
-from sqlalchemy.sql.selectable import Select  # for typing
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import Type
 
 from .. import models, schemas
 from ..database import get_db
@@ -14,7 +11,6 @@ router = APIRouter(
     prefix="/units",
     tags=["units"],
 )
-
 
 
 # unit endpoints
@@ -29,111 +25,107 @@ def read_units(active_only: bool = False, db: Session = Depends(get_db)):
     return unit_orms
 
 
-# @router.get("/{id}", response_model=schemas.TagSchema)
-# def read_tag(id: int, active_only: bool = False, db: Session = Depends(get_db)):
+@router.get("/{id}", response_model=schemas.UnitSchema)
+def read_unit(id: int, active_only: bool = False, db: Session = Depends(get_db)):
 
-#     base_query = select(models.Tag).where(models.Tag.id == id)
-#     finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
+    base_query = select(models.Unit).where(models.Unit.id == id)
+    finished_query = modify_query_for_activity(models.Unit, base_query, active_only)
 
-#     tag_orm = db.execute(finished_query).unique().scalar_one_or_none()
-#     if not tag_orm:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' not found")
+    unit_orm = db.execute(finished_query).unique().scalar_one_or_none()
+    if not unit_orm:
+        raise HTTPException(status_code=404, detail=f"Unit '{id}' not found")
 
-#     return tag_orm
-
-
-# @router.post("/", response_model=schemas.TagSchema, status_code=201)
-# def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db)):
-
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(select(models.Tag).where(models.Tag.name == tag_schema_input.name))
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if existing_tag:
-#         raise HTTPException(
-#             status_code=409,
-#             detail=f"Tag '{tag_schema_input.name}' with id '{existing_tag.id}' already exists",
-#         )
-
-#     # create model instance
-#     tag_orm = models.Tag(**tag_schema_input.model_dump())
-
-#     # update db
-#     db.add(tag_orm)
-#     db.commit()
-#     db.refresh(tag_orm)
-
-#     return tag_orm
+    return unit_orm
 
 
-# @router.put("/{id}", response_model=schemas.TagSchema)
-# def update_tag(
-#     id: int, tag_schema_input: schemas.TagEdit, db: Session = Depends(get_db)
-# ):
+@router.post("/", response_model=schemas.UnitSchema, status_code=201)
+def create_unit(unit_schema_input: schemas.UnitCreate, db: Session = Depends(get_db)):
 
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(select(models.Tag).where(models.Tag.id == id))
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if not existing_tag:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
+    # check for existing record
+    existing_unit = (
+        db.execute(
+            select(models.Unit).where(models.Unit.name == unit_schema_input.name)
+        )
+        .unique()
+        .scalar_one_or_none()
+    )
+    if existing_unit:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Unit '{unit_schema_input.name}' with id '{existing_unit.id}' already exists",
+        )
 
-#     # check input schema tag name doesn't already exist on another record
-#     if existing_tag.name != tag_schema_input.name:
-#         conflicting_tag = (
-#             db.execute(
-#                 select(models.Tag).where(models.Tag.name == tag_schema_input.name)
-#             )
-#             .unique()
-#             .scalar_one_or_none()
-#         )
-#         if conflicting_tag:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=f"Tag '{tag_schema_input.name}' with id '{conflicting_tag.id}' already exists. Cannot update tag '{id}'.",
-#             )
+    # create model instance
+    unit_orm = models.Unit(**unit_schema_input.model_dump())
 
-#     # # create model instance
-#     # tag_orm_new = models.Tag(id=id, **tag_schema_input.model_dump())
+    # update db
+    db.add(unit_orm)
+    db.commit()
+    db.refresh(unit_orm)
 
-#     # # update attributes on existing tag
-#     # for key in tag_orm_new.__mapper__.attrs.keys():
-#     #   setattr(existing_tag, key, getattr(tag_orm_new, key))
-#     for key, value in tag_schema_input.model_dump().items():
-#         setattr(existing_tag, key, value)
-
-#     # update db
-#     db.commit()
-#     db.refresh(existing_tag)
-
-#     return existing_tag
+    return unit_orm
 
 
-# @router.delete("/{id}", response_model=schemas.TagSchema)
-# def delete_tag(id: int, db: Session = Depends(get_db)):
+@router.put("/{id}", response_model=schemas.UnitSchema)
+def update_unit(
+    id: int, unit_schema_input: schemas.UnitEdit, db: Session = Depends(get_db)
+):
 
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(
-#             select(models.Tag)
-#             .where(models.Tag.is_active == True)
-#             .where(models.Tag.id == id)
-#         )
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if not existing_tag:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
+    # check for existing record
+    existing_unit = (
+        db.execute(select(models.Unit).where(models.Unit.id == id))
+        .unique()
+        .scalar_one_or_none()
+    )
+    if not existing_unit:
+        raise HTTPException(status_code=404, detail=f"Unit '{id}' does not exist")
 
-#     # make existing tag inactive
-#     existing_tag.is_active = False
+    # check input schema unit name doesn't already exist on another record
+    if existing_unit.name != unit_schema_input.name:
+        conflicting_unit = (
+            db.execute(
+                select(models.Unit).where(models.Unit.name == unit_schema_input.name)
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
+        if conflicting_unit:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Tag '{unit_schema_input.name}' with id '{conflicting_unit.id}' already exists. Cannot update tag '{id}'.",
+            )
 
-#     # update db
-#     db.commit()
-#     db.refresh(existing_tag)
+    for key, value in unit_schema_input.model_dump().items():
+        setattr(existing_unit, key, value)
 
-#     return existing_tag
+    # update db
+    db.commit()
+    db.refresh(existing_unit)
+
+    return existing_unit
+
+
+@router.delete("/{id}", response_model=schemas.UnitSchema)
+def delete_unit(id: int, db: Session = Depends(get_db)):
+
+    # check for existing record
+    existing_unit = (
+        db.execute(
+            select(models.Unit)
+            .where(models.Unit.is_active == True)
+            .where(models.Unit.id == id)
+        )
+        .unique()
+        .scalar_one_or_none()
+    )
+    if not existing_unit:
+        raise HTTPException(status_code=404, detail=f"Unit '{id}' does not exist")
+
+    # make existing tag inactive
+    existing_unit.is_active = False
+
+    # update db
+    db.commit()
+    db.refresh(existing_unit)
+
+    return existing_unit
