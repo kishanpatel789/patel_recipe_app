@@ -45,14 +45,23 @@ class UnitEdit(UnitBase):
 class UnitSchema(UnitEdit):
     id: int
 
+class IngredientBase(MyBaseModel):
+    quantity: float
+    unit: UnitBase
+    item: str
+
+class DirectionBase(MyBaseModel):
+    description_: str
+    ingredients: List[IngredientBase]
+
 
 class RecipeBase(MyBaseModel):
     name: str
     slug: str
 
 
-class RecipeCreate(RecipeBase):
-    pass
+# class RecipeCreate(RecipeBase):
+#     pass
 
 
 class RecipeEdit(RecipeBase):
@@ -65,3 +74,7 @@ class RecipeSchema(RecipeEdit):
     date_modified: datetime | None
     created_by: int
     modified_by: int | None
+
+class RecipeDetailSchema(RecipeSchema):
+    directions: List[DirectionBase]
+

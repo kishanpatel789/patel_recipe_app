@@ -133,7 +133,34 @@ print(str(
         .join(Unit, isouter=True)
 ))
 # %%
-query = select(models.Recipe)
+query = select(
+        models.Recipe, 
+        models.Direction.order_id.label('direction_order_id'),
+        models.Direction.description_,
+        models.Ingredient.order_id.label('ingredient_order_id'),
+    ).join(
+        models.Recipe.directions, isouter=True
+    ).join(
+        models.Direction.ingredients, isouter=True
+    ).where(
+        models.Recipe.id==1
+    ).order_by(
+        models.Direction.order_id,
+        models.Ingredient.order_id,
+    )
 
+print(str(query))
+
+# %%
 results = db.execute(query).scalars().all()
+
+# %%
+print(str (
+    select(
+        models.Recipe, 
+    ).join(
+        models.Direction, isouter=True
+    ).where(models.Recipe.id==1)
+))
+
 # %%

@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import Type
+from typing import Type, Optional
 
 from .. import models, schemas
 from ..database import get_db
@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-# tag endpoints
+# endpoints
 @router.get("/", response_model=list[schemas.RecipeSchema])
 def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
 
@@ -28,17 +28,17 @@ def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
     return recipe_orms
 
 
-# @router.get("/{id}", response_model=schemas.RecipeSchema)
-# def read_tag(id: int, active_only: bool = False, db: Session = Depends(get_db)):
+@router.get("/id/{id}", response_model=schemas.RecipeDetailSchema)
+def read_recipe(id: int, active_only: bool = False, db: Session = Depends(get_db)):
 
-#     base_query = select(models.Recipe).where(models.Recipe.id == id)
-#     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
+    base_query = select(models.Recipe).where(models.Recipe.id == id)
+    finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
 
-#     tag_orm = db.execute(finished_query).unique().scalar_one_or_none()
-#     if not tag_orm:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' not found")
+    recipe_orm = db.execute(finished_query).unique().scalar_one_or_none()
+    if not recipe_orm:
+        raise HTTPException(status_code=404, detail=f"Recipe '{id}' not found")
 
-#     return tag_orm
+    return recipe_orm
 
 
 # @router.post("/", response_model=schemas.RecipeSchema, status_code=201)
