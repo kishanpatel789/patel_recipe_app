@@ -2,11 +2,16 @@
 import sys
 sys.path.insert(1, '..')
 
-from api.models import Tag
-from api.schemas import TagEdit
+# %%
+import api.models as models
+import api.schemas as schemas
+from api.database import SessionLocal
+from sqlalchemy import select
+
 
 # %%
-app = create_app()
+# app = create_app()
+db = SessionLocal()
 
 # %%
 with app.app_context():
@@ -127,4 +132,8 @@ print(str(
         .select_from(subquery)
         .join(Unit, isouter=True)
 ))
+# %%
+query = select(models.Recipe)
+
+results = db.execute(query).scalars().all()
 # %%

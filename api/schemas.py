@@ -44,3 +44,24 @@ class UnitEdit(UnitBase):
 
 class UnitSchema(UnitEdit):
     id: int
+
+
+class RecipeBase(MyBaseModel):
+    name: str
+    slug: str
+
+
+class RecipeCreate(RecipeBase):
+    pass
+
+
+class RecipeEdit(RecipeBase):
+    is_active: bool
+
+
+class RecipeSchema(RecipeEdit):
+    id: int
+    date_created: datetime
+    date_modified: datetime | None
+    created_by: int
+    modified_by: int | None
