@@ -29,7 +29,7 @@ def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
 
 
 @router.get("/id/{id}", response_model=schemas.RecipeDetailSchema)
-def read_recipe(id: int, active_only: bool = False, db: Session = Depends(get_db)):
+def read_recipe_by_id(id: int, active_only: bool = False, db: Session = Depends(get_db)):
 
     base_query = select(models.Recipe).where(models.Recipe.id == id)
     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
@@ -37,6 +37,18 @@ def read_recipe(id: int, active_only: bool = False, db: Session = Depends(get_db
     recipe_orm = db.execute(finished_query).unique().scalar_one_or_none()
     if not recipe_orm:
         raise HTTPException(status_code=404, detail=f"Recipe '{id}' not found")
+
+    return recipe_orm
+
+@router.get("/slug/{slug}", response_model=schemas.RecipeDetailSchema)
+def read_recipe_by_slug(slug: str, active_only: bool = False, db: Session = Depends(get_db)):
+
+    base_query = select(models.Recipe).where(models.Recipe.slug == slug)
+    finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
+
+    recipe_orm = db.execute(finished_query).unique().scalar_one_or_none()
+    if not recipe_orm:
+        raise HTTPException(status_code=404, detail=f"Recipe '{slug}' not found")
 
     return recipe_orm
 
