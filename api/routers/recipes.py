@@ -105,8 +105,25 @@ def create_recipe(
                 db.add(direction_orm)
                 db.flush()
 
-                # update ingredient model
+                # process ingredients
                 for j, ingredient in enumerate(direction.ingredients):
+                    # verify unit id
+                    existing_unit = (
+                        db.execute(
+                            select(models.Unit).where(
+                                models.Unit.id == ingredient.unit_id,
+                            )
+                        )
+                        .unique()
+                        .scalar_one_or_none()
+                    )
+                    if existing_unit == None:
+                        raise HTTPException(
+                            status_code=409,
+                            detail=f"Unit ID '{ingredient.unit_id}' does not exist. Referenced in direction '{i}', ingredient '{j}' '{ingredient.item}'",
+                        )
+
+                    # create ingredient model
                     ingredient_orm = models.Ingredient(
                         direction_id=direction_orm.id,
                         order_id=j + 1,
