@@ -6,7 +6,7 @@ sys.path.insert(1, '..')
 import api.models as models
 import api.schemas as schemas
 from api.database import SessionLocal
-from sqlalchemy import select
+from sqlalchemy import select, or_
 
 
 # %%
@@ -163,4 +163,9 @@ print(str (
     ).where(models.Recipe.id==1)
 ))
 
+# %%
+print(str(
+    select(models.Recipe).where(or_(models.Recipe.name=='Hello World', 
+                                    models.Recipe.slug=='hello-world'))
+))
 # %%

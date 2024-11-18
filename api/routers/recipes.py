@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -29,7 +29,9 @@ def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
 
 
 @router.get("/id/{id}", response_model=schemas.RecipeDetailSchema)
-def read_recipe_by_id(id: int, active_only: bool = False, db: Session = Depends(get_db)):
+def read_recipe_by_id(
+    id: int, active_only: bool = False, db: Session = Depends(get_db)
+):
 
     base_query = select(models.Recipe).where(models.Recipe.id == id)
     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
@@ -40,8 +42,11 @@ def read_recipe_by_id(id: int, active_only: bool = False, db: Session = Depends(
 
     return recipe_orm
 
+
 @router.get("/slug/{slug}", response_model=schemas.RecipeDetailSchema)
-def read_recipe_by_slug(slug: str, active_only: bool = False, db: Session = Depends(get_db)):
+def read_recipe_by_slug(
+    slug: str, active_only: bool = False, db: Session = Depends(get_db)
+):
 
     base_query = select(models.Recipe).where(models.Recipe.slug == slug)
     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
@@ -53,30 +58,66 @@ def read_recipe_by_slug(slug: str, active_only: bool = False, db: Session = Depe
     return recipe_orm
 
 
-# @router.post("/", response_model=schemas.RecipeSchema, status_code=201)
-# def create_tag(tag_schema_input: schemas.TagCreate, db: Session = Depends(get_db)):
+@router.post("/", response_model=schemas.RecipeDetailSchema, status_code=201)
+def create_recipe(
+    recipe_schema_input: schemas.RecipeCreate, db: Session = Depends(get_db)
+):
 
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(select(models.Recipe).where(models.Recipe.name == tag_schema_input.name))
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if existing_tag:
-#         raise HTTPException(
-#             status_code=409,
-#             detail=f"Tag '{tag_schema_input.name}' with id '{existing_tag.id}' already exists",
-#         )
+    # check for existing recipe
+    existing_recipe = (
+        db.execute(
+            select(models.Recipe).where(
+                or_(
+                    models.Recipe.name == recipe_schema_input.name,
+                    models.Recipe.slug == recipe_schema_input.slug,
+                )
+            )
+        )
+        .unique()
+        .scalar_one_or_none()
+    )
 
-#     # create model instance
-#     tag_orm = models.Recipe(**tag_schema_input.model_dump())
+    if existing_recipe:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Recipe '{recipe_schema_input.name}' with slug '{existing_recipe.slug}' and id '{existing_recipe.id}' already exists",
+        )
 
-#     # update db
-#     db.add(tag_orm)
-#     db.commit()
-#     db.refresh(tag_orm)
+    # create recipe model
+    recipe_orm = models.Recipe(
+        name=recipe_schema_input.name,
+        slug=recipe_schema_input.slug,
+        created_by=1,  # TODO: remove hard-code with logged in user
+    )
+    db.add(recipe_orm)
+    db.flush()
 
-#     return tag_orm
+    # create direction model
+    for i, direction in enumerate(recipe_schema_input.directions):
+        direction_orm = models.Direction(
+            recipe_id=recipe_orm.id,
+            order_id=i + 1,
+            description_=direction.description_,
+        )
+        db.add(direction_orm)
+        db.flush()
+
+        # # update ingredient model
+        # for j, ingredient in enumerate(direction.ingredients):
+        #     ingredient_orm = Ingredient(
+        #         direction_id = direction_orm.id,
+        #         order_id = j+1,
+        #         quantity = ingredient.quantity.data,
+        #         unit_id = ingredient.unit_id.data,
+        #         item = ingredient.item.data,
+        #     )
+        #     db.add(ingredient_orm)
+
+    # update db
+    db.commit()
+    db.refresh(recipe_orm)
+
+    return recipe_orm
 
 
 # @router.put("/{id}", response_model=schemas.RecipeSchema)
