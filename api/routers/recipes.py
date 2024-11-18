@@ -83,38 +83,43 @@ def create_recipe(
             detail=f"Recipe '{recipe_schema_input.name}' with slug '{existing_recipe.slug}' and id '{existing_recipe.id}' already exists",
         )
 
-    # create recipe model
-    recipe_orm = models.Recipe(
-        name=recipe_schema_input.name,
-        slug=recipe_schema_input.slug,
-        created_by=1,  # TODO: remove hard-code with logged in user
-    )
-    db.add(recipe_orm)
-    db.flush()
+    try:
+        db.close()  # close session to handle transactional-level management
+        with db.begin():
+            # create recipe model
+            recipe_orm = models.Recipe(
+                name=recipe_schema_input.name,
+                slug=recipe_schema_input.slug,
+                created_by=1,  # TODO: remove hard-code with logged in user
+            )
+            db.add(recipe_orm)
+            db.flush()
 
-    # create direction model
-    for i, direction in enumerate(recipe_schema_input.directions):
-        direction_orm = models.Direction(
-            recipe_id=recipe_orm.id,
-            order_id=i + 1,
-            description_=direction.description_,
-        )
-        db.add(direction_orm)
-        db.flush()
+            # create direction model
+            for i, direction in enumerate(recipe_schema_input.directions):
+                direction_orm = models.Direction(
+                    recipe_id=recipe_orm.id,
+                    order_id=i + 1,
+                    description_=direction.description_,
+                )
+                db.add(direction_orm)
+                db.flush()
 
-        # # update ingredient model
-        # for j, ingredient in enumerate(direction.ingredients):
-        #     ingredient_orm = Ingredient(
-        #         direction_id = direction_orm.id,
-        #         order_id = j+1,
-        #         quantity = ingredient.quantity.data,
-        #         unit_id = ingredient.unit_id.data,
-        #         item = ingredient.item.data,
-        #     )
-        #     db.add(ingredient_orm)
+                # update ingredient model
+                for j, ingredient in enumerate(direction.ingredients):
+                    ingredient_orm = models.Ingredient(
+                        direction_id=direction_orm.id,
+                        order_id=j + 1,
+                        quantity=ingredient.quantity,
+                        unit_id=ingredient.unit_id,
+                        item=ingredient.item,
+                    )
+                    db.add(ingredient_orm)
 
-    # update db
-    db.commit()
+    except Exception as e:
+        print(e)
+        raise
+
     db.refresh(recipe_orm)
 
     return recipe_orm
