@@ -77,7 +77,7 @@ class RecipeCreate(RecipeBase):
     directions: List[DirectionCreate]
 
 
-class RecipeEdit(RecipeBase):
+class RecipeEdit(RecipeCreate):
     is_active: bool
 
 

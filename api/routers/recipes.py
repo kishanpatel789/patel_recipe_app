@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from typing import Type, Optional
+from datetime import datetime, UTC
 
 from .. import models, schemas
 from ..database import get_db
@@ -37,7 +38,7 @@ def read_recipe_by_id(
     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
 
     recipe_orm = db.execute(finished_query).unique().scalar_one_or_none()
-    if not recipe_orm:
+    if recipe_orm is None:
         raise HTTPException(status_code=404, detail=f"Recipe '{id}' not found")
 
     return recipe_orm
@@ -52,7 +53,7 @@ def read_recipe_by_slug(
     finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
 
     recipe_orm = db.execute(finished_query).unique().scalar_one_or_none()
-    if not recipe_orm:
+    if recipe_orm is None:
         raise HTTPException(status_code=404, detail=f"Recipe '{slug}' not found")
 
     return recipe_orm
@@ -142,49 +143,174 @@ def create_recipe(
     return recipe_orm
 
 
-# @router.put("/{id}", response_model=schemas.RecipeSchema)
-# def update_tag(
-#     id: int, tag_schema_input: schemas.TagEdit, db: Session = Depends(get_db)
-# ):
+@router.put("/{id}", response_model=schemas.RecipeDetailSchema)
+def update_recipe(
+    id: int, recipe_schema_input: schemas.RecipeEdit, db: Session = Depends(get_db)
+):
 
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(select(models.Recipe).where(models.Recipe.id == id))
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if not existing_tag:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
+    # check for existing recipe
+    existing_recipe = (
+        db.execute(select(models.Recipe).where(models.Recipe.id == id))
+        .unique()
+        .scalar_one_or_none()
+    )
+    if existing_recipe is None:
+        raise HTTPException(status_code=404, detail=f"Recipe '{id}' does not exist")
 
-#     # check input schema tag name doesn't already exist on another record
-#     if existing_tag.name != tag_schema_input.name:
-#         conflicting_tag = (
-#             db.execute(
-#                 select(models.Recipe).where(models.Recipe.name == tag_schema_input.name)
-#             )
-#             .unique()
-#             .scalar_one_or_none()
-#         )
-#         if conflicting_tag:
-#             raise HTTPException(
-#                 status_code=400,
-#                 detail=f"Tag '{tag_schema_input.name}' with id '{conflicting_tag.id}' already exists. Cannot update tag '{id}'.",
-#             )
+    # check input schema recipe name doesn't already exist on another record
+    if existing_recipe.name != recipe_schema_input.name:
+        conflicting_recipe = (
+            db.execute(
+                select(models.Recipe).where(
+                    models.Recipe.name == recipe_schema_input.name
+                )
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
+        if conflicting_recipe:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Recipe '{recipe_schema_input.name}' with id '{conflicting_recipe.id}' already exists. Cannot update slug '{id}'.",
+            )
 
-#     # # create model instance
-#     # tag_orm_new = models.Recipe(id=id, **tag_schema_input.model_dump())
+    # check input schema recipe slug doesn't already exist on another record
+    if existing_recipe.slug != recipe_schema_input.slug:
+        conflicting_recipe = (
+            db.execute(
+                select(models.Recipe).where(
+                    models.Recipe.slug == recipe_schema_input.slug
+                )
+            )
+            .unique()
+            .scalar_one_or_none()
+        )
+        if conflicting_recipe:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Recipe '{recipe_schema_input.slug}' with id '{conflicting_recipe.id}' already exists. Cannot update slug '{id}'.",
+            )
 
-#     # # update attributes on existing tag
-#     # for key in tag_orm_new.__mapper__.attrs.keys():
-#     #   setattr(existing_tag, key, getattr(tag_orm_new, key))
-#     for key, value in tag_schema_input.model_dump().items():
-#         setattr(existing_tag, key, value)
+    try:
+        db.close()  # close session to handle transactional-level management
+        with db.begin():
 
-#     # update db
-#     db.commit()
-#     db.refresh(existing_tag)
+            # update recipe model
+            existing_recipe = (
+                db.execute(select(models.Recipe).where(models.Recipe.id == id))
+                .unique()
+                .scalar_one()
+            )
+            existing_recipe.name = recipe_schema_input.name
+            existing_recipe.slug = recipe_schema_input.slug
+            existing_recipe.date_modified = datetime.now(UTC)
+            existing_recipe.modified_by = 2
+            existing_recipe.is_active = recipe_schema_input.is_active
 
-#     return existing_tag
+            # update direction model - create, update, delete
+            # get existing directions
+            existing_directions = (
+                db.execute(
+                    select(models.Direction)
+                    .where(models.Direction.recipe_id == id)
+                    .order_by(models.Direction.order_id)
+                )
+                .scalars()
+                .unique()
+                .all()
+            )
+            existing_direction_cnt = len(existing_directions)
+            new_direction_cnt = len(recipe_schema_input.directions)
+
+            for input_direction_index, input_direction in enumerate(
+                recipe_schema_input.directions
+            ):
+                if input_direction_index < existing_direction_cnt:
+                    # update direction
+                    existing_direction = existing_directions[input_direction_index]
+                    existing_direction.description_ = input_direction.description_
+
+                    # get existing ingredients
+                    existing_ingredients = (
+                        db.execute(
+                            select(models.Ingredient)
+                            .where(
+                                models.Ingredient.direction_id == existing_direction.id
+                            )
+                            .order_by(models.Ingredient.order_id)
+                        )
+                        .scalars()
+                        .unique()
+                        .all()
+                    )
+                    existing_ingredient_cnt = len(existing_ingredients)
+                    new_ingredient_cnt = len(input_direction.ingredients)
+                    new_ingredients = []
+
+                    for input_ingredient_index, input_ingredient in enumerate(
+                        input_direction.ingredients
+                    ):
+
+                        if input_ingredient_index < existing_ingredient_cnt:
+                            # update ingredient for existing direction
+                            existing_ingredient = existing_ingredients[
+                                input_ingredient_index
+                            ]
+                            existing_ingredient.quantity = input_ingredient.quantity
+                            existing_ingredient.unit_id = input_ingredient.unit_id
+                            existing_ingredient.item = input_ingredient.item
+                        else:
+                            # create ingredient for existing direction
+                            new_ingredient = models.Ingredient(
+                                direction_id=existing_direction.id,
+                                order_id=input_ingredient_index + 1,
+                                quantity=input_ingredient.quantity,
+                                unit_id=input_ingredient.unit_id,
+                                item=input_ingredient.item,
+                            )
+                            new_ingredients.append(new_ingredient)
+                    db.add_all(new_ingredients)
+
+                    # delete ingredient for existing direction
+                    if new_ingredient_cnt < existing_ingredient_cnt:
+                        for i in range(new_ingredient_cnt, existing_ingredient_cnt):
+                            db.delete(existing_ingredients[i])
+                else:
+                    # create direction
+                    new_direction = models.Direction(
+                        recipe_id=id,
+                        order_id=input_direction_index + 1,
+                        description_=input_direction.description_,
+                    )
+                    db.add(new_direction)
+                    db.flush()
+
+                    # create ingredients for new direction
+                    new_ingredients = []
+                    for input_ingredient_index, input_ingredient in enumerate(
+                        input_direction.ingredients
+                    ):
+                        new_ingredient = models.Ingredient(
+                            direction_id=new_direction.id,
+                            order_id=input_ingredient_index + 1,
+                            quantity=input_ingredient.quantity,
+                            unit_id=input_ingredient.unit_id,
+                            item=input_ingredient.item,
+                        )
+                        new_ingredients.append(new_ingredient)
+                    db.add_all(new_ingredients)
+
+            # delete direction
+            if new_direction_cnt < existing_direction_cnt:
+                for i in range(new_direction_cnt, existing_direction_cnt):
+                    db.delete(existing_directions[i])
+    except Exception as e:
+        print(e)
+        raise
+
+    db.refresh(existing_recipe)
+
+    return existing_recipe
 
 
 # @router.delete("/{id}", response_model=schemas.RecipeSchema)
