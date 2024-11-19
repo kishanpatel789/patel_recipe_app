@@ -17,21 +17,24 @@ router = APIRouter(
 )
 
 
-def verify_unit_id(unit_id: int, db: Session):
-    existing_unit = (
-        db.execute(
-            select(models.Unit)
-            .where(models.Unit.id == unit_id)
-            .where(models.Unit.is_active == True)
+def verify_unit_id(unit_id: int | None, db: Session):
+    if unit_id is None:
+        pass
+    else:
+        existing_unit = (
+            db.execute(
+                select(models.Unit)
+                .where(models.Unit.id == unit_id)
+                .where(models.Unit.is_active == True)
+            )
+            .unique()
+            .scalar_one_or_none()
         )
-        .unique()
-        .scalar_one_or_none()
-    )
-    if existing_unit is None:
-        raise HTTPException(
-            status_code=409,
-            detail=f"Unit ID '{unit_id}' does not exist or is inactive.",
-        )
+        if existing_unit is None:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Unit ID '{unit_id}' does not exist or is inactive.",
+            )
 
 
 # endpoints

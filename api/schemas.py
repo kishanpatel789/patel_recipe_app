@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, HttpUrl, constr
+from pydantic import BaseModel, ConfigDict, HttpUrl, constr, PositiveFloat
 from typing import Optional, List
 from datetime import datetime
 
@@ -51,20 +51,20 @@ class UnitDetailSchema(UnitEdit):
 
 
 class IngredientBase(MyBaseModel):
-    quantity: float | None
-    unit: UnitBase | None
+    quantity: PositiveFloat | None = None
+    unit: UnitBase | None = None
     item: str
 
 
 class IngredientCreate(MyBaseModel):
-    quantity: float
-    unit_id: int
+    quantity: PositiveFloat | None = None
+    unit_id: int | None = None
     item: str
 
 
 class IngredientSchema(IngredientBase):
     id: int
-    unit: UnitSchema
+    unit: UnitSchema | None = None
 
 
 class DirectionBase(MyBaseModel):
@@ -98,9 +98,9 @@ class RecipeEdit(RecipeCreate):
 class RecipeSchema(RecipeBase):
     id: int
     date_created: datetime
-    date_modified: datetime | None
+    date_modified: datetime | None = None
     created_by: int
-    modified_by: int | None
+    modified_by: int | None = None
     is_active: bool
 
 
