@@ -42,13 +42,17 @@ class UnitEdit(UnitBase):
     is_active: bool
 
 
-class UnitSchema(UnitEdit):
+class UnitSchema(UnitBase):
+    id: int
+
+
+class UnitDetailSchema(UnitEdit):
     id: int
 
 
 class IngredientBase(MyBaseModel):
-    quantity: float
-    unit: UnitBase
+    quantity: float | None
+    unit: UnitBase | None
     item: str
 
 
@@ -56,6 +60,11 @@ class IngredientCreate(MyBaseModel):
     quantity: float
     unit_id: int
     item: str
+
+
+class IngredientSchema(IngredientBase):
+    id: int
+    unit: UnitSchema
 
 
 class DirectionBase(MyBaseModel):
@@ -66,6 +75,11 @@ class DirectionBase(MyBaseModel):
 class DirectionCreate(MyBaseModel):
     description_: str
     ingredients: List[IngredientCreate]
+
+
+class DirectionSchema(DirectionBase):
+    id: int
+    ingredients: List[IngredientSchema]
 
 
 class RecipeBase(MyBaseModel):
@@ -81,13 +95,14 @@ class RecipeEdit(RecipeCreate):
     is_active: bool
 
 
-class RecipeSchema(RecipeEdit):
+class RecipeSchema(RecipeBase):
     id: int
     date_created: datetime
     date_modified: datetime | None
     created_by: int
     modified_by: int | None
+    is_active: bool
 
 
 class RecipeDetailSchema(RecipeSchema):
-    directions: List[DirectionBase]
+    directions: List[DirectionSchema]

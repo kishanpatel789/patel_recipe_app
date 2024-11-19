@@ -14,7 +14,7 @@ router = APIRouter(
 
 
 # unit endpoints
-@router.get("/", response_model=list[schemas.UnitSchema])
+@router.get("/", response_model=list[schemas.UnitDetailSchema])
 def read_units(active_only: bool = False, db: Session = Depends(get_db)):
 
     base_query = select(models.Unit).order_by(models.Unit.name)
@@ -25,7 +25,7 @@ def read_units(active_only: bool = False, db: Session = Depends(get_db)):
     return unit_orms
 
 
-@router.get("/{id}", response_model=schemas.UnitSchema)
+@router.get("/{id}", response_model=schemas.UnitDetailSchema)
 def read_unit(id: int, active_only: bool = False, db: Session = Depends(get_db)):
 
     base_query = select(models.Unit).where(models.Unit.id == id)
@@ -38,7 +38,7 @@ def read_unit(id: int, active_only: bool = False, db: Session = Depends(get_db))
     return unit_orm
 
 
-@router.post("/", response_model=schemas.UnitSchema, status_code=201)
+@router.post("/", response_model=schemas.UnitDetailSchema, status_code=201)
 def create_unit(unit_schema_input: schemas.UnitCreate, db: Session = Depends(get_db)):
 
     # check for existing record
@@ -66,7 +66,7 @@ def create_unit(unit_schema_input: schemas.UnitCreate, db: Session = Depends(get
     return unit_orm
 
 
-@router.put("/{id}", response_model=schemas.UnitSchema)
+@router.put("/{id}", response_model=schemas.UnitDetailSchema)
 def update_unit(
     id: int, unit_schema_input: schemas.UnitEdit, db: Session = Depends(get_db)
 ):
@@ -105,7 +105,7 @@ def update_unit(
     return existing_unit
 
 
-@router.delete("/{id}", response_model=schemas.UnitSchema)
+@router.delete("/{id}", response_model=schemas.UnitDetailSchema)
 def delete_unit(id: int, db: Session = Depends(get_db)):
 
     # check for existing record
