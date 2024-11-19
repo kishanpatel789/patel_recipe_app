@@ -17,6 +17,23 @@ router = APIRouter(
 )
 
 
+def verify_unit_id(unit_id: int, db: Session):
+    existing_unit = (
+        db.execute(
+            select(models.Unit)
+            .where(models.Unit.id == unit_id)
+            .where(models.Unit.is_active == True)
+        )
+        .unique()
+        .scalar_one_or_none()
+    )
+    if existing_unit is None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Unit ID '{unit_id}' does not exist or is inactive.",
+        )
+
+
 # endpoints
 @router.get("/", response_model=list[schemas.RecipeSchema])
 def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
@@ -108,21 +125,7 @@ def create_recipe(
 
                 # process ingredients
                 for j, ingredient in enumerate(direction.ingredients):
-                    # verify unit id
-                    existing_unit = (
-                        db.execute(
-                            select(models.Unit).where(
-                                models.Unit.id == ingredient.unit_id,
-                            )
-                        )
-                        .unique()
-                        .scalar_one_or_none()
-                    )
-                    if existing_unit == None:
-                        raise HTTPException(
-                            status_code=409,
-                            detail=f"Unit ID '{ingredient.unit_id}' does not exist. Referenced in direction '{i}', ingredient '{j}' '{ingredient.item}'",
-                        )
+                    verify_unit_id(ingredient.unit_id, db)
 
                     # create ingredient model
                     ingredient_orm = models.Ingredient(
@@ -250,6 +253,7 @@ def update_recipe(
                     for input_ingredient_index, input_ingredient in enumerate(
                         input_direction.ingredients
                     ):
+                        verify_unit_id(input_ingredient.unit_id, db)
 
                         if input_ingredient_index < existing_ingredient_cnt:
                             # update ingredient for existing direction
@@ -290,6 +294,8 @@ def update_recipe(
                     for input_ingredient_index, input_ingredient in enumerate(
                         input_direction.ingredients
                     ):
+                        verify_unit_id(input_ingredient.unit_id, db)
+
                         new_ingredient = models.Ingredient(
                             direction_id=new_direction.id,
                             order_id=input_ingredient_index + 1,
