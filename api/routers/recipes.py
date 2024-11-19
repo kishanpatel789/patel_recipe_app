@@ -313,27 +313,29 @@ def update_recipe(
     return existing_recipe
 
 
-# @router.delete("/{id}", response_model=schemas.RecipeSchema)
-# def delete_tag(id: int, db: Session = Depends(get_db)):
+@router.delete("/{id}", response_model=schemas.RecipeDetailSchema)
+def delete_recipe(id: int, db: Session = Depends(get_db)):
 
-#     # check for existing tag
-#     existing_tag = (
-#         db.execute(
-#             select(models.Recipe)
-#             .where(models.Recipe.is_active == True)
-#             .where(models.Recipe.id == id)
-#         )
-#         .unique()
-#         .scalar_one_or_none()
-#     )
-#     if not existing_tag:
-#         raise HTTPException(status_code=404, detail=f"Tag '{id}' does not exist")
+    # check for existing recipe
+    existing_recipe = (
+        db.execute(
+            select(models.Recipe)
+            .where(models.Recipe.is_active == True)
+            .where(models.Recipe.id == id)
+        )
+        .unique()
+        .scalar_one_or_none()
+    )
+    if existing_recipe is None:
+        raise HTTPException(status_code=404, detail=f"Recipe '{id}' does not exist")
 
-#     # make existing tag inactive
-#     existing_tag.is_active = False
+    # make existing recipe inactive
+    existing_recipe.is_active = False
+    existing_recipe.date_modified = datetime.now(UTC)
+    existing_recipe.modified_by = 2
 
-#     # update db
-#     db.commit()
-#     db.refresh(existing_tag)
+    # update db
+    db.commit()
+    db.refresh(existing_recipe)
 
-#     return existing_tag
+    return existing_recipe
