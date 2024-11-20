@@ -11,6 +11,17 @@ TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestEngi
 
 
 @pytest.fixture()
+def test_db():
+    # initialize database
+    metadata_obj.create_all(bind=TestEngine)
+    yield 
+    # tear down db
+    metadata_obj.drop_all(bind=TestEngine)
+
+
+    
+
+@pytest.fixture()
 def override_get_db():
     # override app dependency
     def _override_get_db():
@@ -29,9 +40,7 @@ def test_client():
     yield TestClient(app)
 
 
-def test_create_tag(override_get_db, test_client):
-    # initialize database
-    metadata_obj.create_all(bind=TestEngine)
+def test_create_tag(test_db, override_get_db, test_client):
 
 
     # test tag creation
@@ -43,5 +52,3 @@ def test_create_tag(override_get_db, test_client):
     data = response.json()
     assert data["name"] == "Vegetarian"
 
-    # tear down db
-    metadata_obj.drop_all(bind=TestEngine)
