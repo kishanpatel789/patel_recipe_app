@@ -1,2 +1,0 @@
-CREATE SCHEMA prod;
-CREATE SCHEMA dev;

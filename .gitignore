@@ -13,3 +13,4 @@ static_site*
 config.json
 *.swp
 .python-version
+.pytest_cache
