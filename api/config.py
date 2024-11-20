@@ -14,3 +14,7 @@ if config_data['db_path_relative']:
     _db_path = app_dir / config_data['db_path']
     _db_path = _db_path.resolve()
     config_data.update({'db_path': str(_db_path)})
+
+    _db_path_test = app_dir / config_data['db_path_test']
+    _db_path_test = _db_path_test.resolve()
+    config_data.update({'db_path_test': str(_db_path_test)})

@@ -17,3 +17,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+# function to create a test database engine
+def create_test_engine():
+    # return create_engine("sqlite:///:memory:", echo=True)
+    return create_engine(f"sqlite:///{config_data['db_path_test']}", echo=True)

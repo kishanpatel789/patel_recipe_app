@@ -1,7 +1,7 @@
 notes.md
 venv
 __pycache__
-recipe.db
+recipe*.db
 seed_data/
 *.png
 .env
