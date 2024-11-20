@@ -10,37 +10,47 @@ TestEngine = create_test_engine()
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestEngine)
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def test_db():
     # initialize database
     metadata_obj.create_all(bind=TestEngine)
-    yield 
-    # tear down db
-    metadata_obj.drop_all(bind=TestEngine)
 
-
-    
-
-@pytest.fixture()
-def override_get_db():
     # override app dependency
     def _override_get_db():
-        print("Overriding get_db dependency")
         db = TestSessionLocal()
         try:
             yield db
         finally:
             db.close()
     app.dependency_overrides[get_db] = _override_get_db
-    yield
-    app.dependency_overrides.clear()
 
-@pytest.fixture()
+    yield 
+
+    # clear app dependency and tear down db
+    app.dependency_overrides.clear()
+    metadata_obj.drop_all(bind=TestEngine)
+
+
+# @pytest.fixture(scope='session')
+# def override_get_db():
+#     # override app dependency
+#     def _override_get_db():
+#         print("Overriding get_db dependency")
+#         db = TestSessionLocal()
+#         try:
+#             yield db
+#         finally:
+#             db.close()
+#     app.dependency_overrides[get_db] = _override_get_db
+#     yield
+#     app.dependency_overrides.clear()
+
+@pytest.fixture(scope='module')
 def test_client():
     yield TestClient(app)
 
 
-def test_create_tag(test_db, override_get_db, test_client):
+def test_create_tag(test_db, test_client):
 
 
     # test tag creation
