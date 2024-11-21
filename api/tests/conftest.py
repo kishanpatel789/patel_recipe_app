@@ -11,7 +11,7 @@ TestEngine = create_test_engine()
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestEngine)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def test_db():
     # initialize database
     metadata_obj.create_all(bind=TestEngine)
@@ -26,14 +26,16 @@ def test_db():
             yield db
         finally:
             db.close()
+
     app.dependency_overrides[get_db] = _override_get_db
 
-    yield 
+    yield
 
     # clear app dependency and tear down db
     app.dependency_overrides.clear()
     metadata_obj.drop_all(bind=TestEngine)
 
-@pytest.fixture(scope='module')
+
+@pytest.fixture(scope="module")
 def test_client():
     yield TestClient(app)

@@ -67,13 +67,13 @@ def seed_test_db(session_maker: sessionmaker):
     with session_maker() as db:
         # models
         for mapper in seed_map:
-            print(mapper['name'])
+            # print(mapper['name'])
             mod_inst_items = []
 
             with open(DIR_SEED_DATA / f'{mapper["file"]}', newline='\n') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    print(row)
+                    # print(row)
                     mod_inst = mapper['cls']()
                     for key, value in row.items():
                         if key == 'id':  # let postgres handle the id creation
@@ -92,12 +92,12 @@ def seed_test_db(session_maker: sessionmaker):
 
         # association tables
         for mapper in seed_map_assoc:
-            print(mapper['name'])
+            # print(mapper['name'])
             records = []
             with open(DIR_SEED_DATA / f'{mapper["file"]}', newline='\n') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    print(row)
+                    # print(row)
                     records.append(row)
             multiple_insert = mapper['tbl'].insert().values(records)
             db.execute(multiple_insert)
