@@ -8,7 +8,7 @@ import pytest
         (True, 8),  # Only active tags
     ],
 )
-def test_read_tags(test_db, test_client, active_only, expected_count):
+def test_read_tags(test_client, active_only, expected_count):
     # Seed inactive tags 
     test_client.put("/tags/1", json={"name": "Inactive Tag", "is_active": False})
 
@@ -19,7 +19,7 @@ def test_read_tags(test_db, test_client, active_only, expected_count):
     assert len(tags) == expected_count
 
 
-def test_read_single_tag(test_db, test_client):
+def test_read_single_tag(test_client):
     # Create a tag
     response = test_client.post("/tags/", json={"name": "Single Tag"})
     assert response.status_code == 201
@@ -32,12 +32,12 @@ def test_read_single_tag(test_db, test_client):
     assert tag["name"] == "Single Tag"
 
 
-def test_read_nonexistent_tag(test_db, test_client):
+def test_read_nonexistent_tag(test_client):
     response = test_client.get("/tags/99999")
     assert response.status_code == 404
 
 
-def test_create_tag(test_db, test_client):
+def test_create_tag(test_client):
     # Send a POST request to create a tag
     response = test_client.post("/tags/", json={"name": "Vegetarian"})
     assert response.status_code == 201
@@ -45,7 +45,7 @@ def test_create_tag(test_db, test_client):
     assert data["name"] == "Vegetarian"
 
 
-def test_create_duplicate_tag(test_db, test_client):
+def test_create_duplicate_tag(test_client):
     # Create a tag
     response = test_client.post("/tags/", json={"name": "Duplicate Tag"})
     assert response.status_code == 201
@@ -56,7 +56,7 @@ def test_create_duplicate_tag(test_db, test_client):
     assert "already exists" in response.json()["detail"]
 
 
-def test_update_tag(test_db, test_client):
+def test_update_tag(test_client):
     # Create a tag to update
     response = test_client.post("/tags/", json={"name": "Old Tag Name"})
     assert response.status_code == 201
@@ -71,7 +71,7 @@ def test_update_tag(test_db, test_client):
     assert updated_tag["name"] == "Updated Tag Name"
 
 
-def test_update_tag_conflicting_name(test_db, test_client):
+def test_update_tag_conflicting_name(test_client):
     # Create two tags
     response1 = test_client.post("/tags/", json={"name": "Existing Tag"})
     assert response1.status_code == 201
@@ -87,7 +87,7 @@ def test_update_tag_conflicting_name(test_db, test_client):
     assert "already exists" in response.json()["detail"]
 
 
-def test_update_nonexistent_tag(test_db, test_client):
+def test_update_nonexistent_tag(test_client):
     response = test_client.put(
         "/tags/99999", json={"name": "Updated Name", "is_active": True}
     )
@@ -95,7 +95,7 @@ def test_update_nonexistent_tag(test_db, test_client):
     assert "does not exist" in response.json()["detail"]
 
 
-def test_delete_tag(test_db, test_client):
+def test_delete_tag(test_client):
     # Create a tag to delete
     response = test_client.post("/tags/", json={"name": "To Delete"})
     assert response.status_code == 201
@@ -108,11 +108,11 @@ def test_delete_tag(test_db, test_client):
     assert data["is_active"] is False
 
 
-def test_delete_tag_nonexistent_id(test_db, test_client):
+def test_delete_tag_nonexistent_id(test_client):
     response = test_client.delete("/tags/40000")
     assert response.status_code == 404
 
 
-def test_delete_tag_invalid_id(test_db, test_client):
+def test_delete_tag_invalid_id(test_client):
     response = test_client.delete("/tags/blah")
     assert response.status_code == 422

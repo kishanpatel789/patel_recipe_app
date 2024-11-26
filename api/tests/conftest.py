@@ -13,6 +13,7 @@ TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=TestEngi
 
 @pytest.fixture(scope="session")
 def test_db():
+    """Fixture to initialize a test database and override the fastapi application's db dependency"""
     # initialize database
     metadata_obj.create_all(bind=TestEngine)
 
@@ -37,5 +38,6 @@ def test_db():
 
 
 @pytest.fixture(scope="module")
-def test_client():
+def test_client(test_db):
+    """Fixture to generate test client"""
     yield TestClient(app)

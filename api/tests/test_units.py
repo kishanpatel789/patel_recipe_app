@@ -8,7 +8,7 @@ import pytest
         (True, 8),  # Only active units
     ],
 )
-def test_read_units(test_db, test_client, active_only, expected_count):
+def test_read_units(test_client, active_only, expected_count):
     # Seed inactive units
     test_client.put(
         "/units/1",
@@ -31,7 +31,7 @@ def test_read_units(test_db, test_client, active_only, expected_count):
             assert unit["is_active"] is True
 
 
-def test_read_single_unit(test_db, test_client):
+def test_read_single_unit(test_client):
     # Create a unit
     response = test_client.post(
         "/units/",
@@ -56,13 +56,13 @@ def test_read_single_unit(test_db, test_client):
     assert data["id"] == unit_id
 
 
-def test_read_nonexistent_unit(test_db, test_client):
+def test_read_nonexistent_unit(test_client):
     response = test_client.get("/units/99999")
     assert response.status_code == 404
     assert "not found" in response.json()["detail"]
 
 
-def test_create_unit(test_db, test_client):
+def test_create_unit(test_client):
     response = test_client.post(
         "/units/",
         json={
@@ -82,7 +82,7 @@ def test_create_unit(test_db, test_client):
     assert data["is_active"] is True  # Default value for `is_active`
 
 
-def test_create_duplicate_unit(test_db, test_client):
+def test_create_duplicate_unit(test_client):
     # Create a unit
     response = test_client.post(
         "/units/",
@@ -109,7 +109,7 @@ def test_create_duplicate_unit(test_db, test_client):
     assert "already exists" in response.json()["detail"]
 
 
-def test_update_unit(test_db, test_client):
+def test_update_unit(test_client):
     # Create a unit to update
     response = test_client.post(
         "/units/",
@@ -143,7 +143,7 @@ def test_update_unit(test_db, test_client):
     assert updated_unit["is_active"] is True
 
 
-def test_update_unit_conflicting_name(test_db, test_client):
+def test_update_unit_conflicting_name(test_client):
     # Create two units
     test_client.post(
         "/units/",
@@ -181,7 +181,7 @@ def test_update_unit_conflicting_name(test_db, test_client):
     assert "already exists" in response.json()["detail"]
 
 
-def test_update_nonexistent_unit(test_db, test_client):
+def test_update_nonexistent_unit(test_client):
     response = test_client.put(
         "/units/99999",
         json={
@@ -196,7 +196,7 @@ def test_update_nonexistent_unit(test_db, test_client):
     assert "does not exist" in response.json()["detail"]
 
 
-def test_delete_unit(test_db, test_client):
+def test_delete_unit(test_client):
     # Create a unit to delete
     response = test_client.post(
         "/units/",
@@ -217,12 +217,12 @@ def test_delete_unit(test_db, test_client):
     assert data["is_active"] is False
 
 
-def test_delete_unit_nonexistent_id(test_db, test_client):
+def test_delete_unit_nonexistent_id(test_client):
     response = test_client.delete("/units/99999")
     assert response.status_code == 404
     assert "does not exist" in response.json()["detail"]
 
 
-def test_delete_unit_invalid_id(test_db, test_client):
+def test_delete_unit_invalid_id(test_client):
     response = test_client.delete("/units/blah")
     assert response.status_code == 422
