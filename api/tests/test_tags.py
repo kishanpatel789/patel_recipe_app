@@ -9,8 +9,8 @@ import pytest
     ],
 )
 def test_read_tags(test_db, test_client, active_only, expected_count):
-    # Seed inactive tags for testing
-    test_client.put(f"/tags/1", json={"name": "Inactive Tag", "is_active": False})
+    # Seed inactive tags 
+    test_client.put("/tags/1", json={"name": "Inactive Tag", "is_active": False})
 
     # Read tags
     response = test_client.get(f"/tags/?active_only={str(active_only).lower()}")
