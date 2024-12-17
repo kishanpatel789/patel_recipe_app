@@ -106,3 +106,14 @@ class RecipeSchema(RecipeBase):
 
 class RecipeDetailSchema(RecipeSchema):
     directions: List[DirectionSchema]
+
+
+class UserBase(MyBaseModel):
+    user_name: str
+    role: str
+
+
+class UserSchema(UserBase):
+    id: int
+    hashed_password: str
+    is_active: bool
