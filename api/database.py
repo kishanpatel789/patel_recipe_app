@@ -4,9 +4,9 @@ from pathlib import Path
 
 from .config import config_data
 
-url = f"sqlite:///{config_data['db_path']}"
+url = f"sqlite:///{config_data['database']['path']}"
 
-engine = create_engine(url, echo=True) # remove echo=True in prod
+engine = create_engine(url, echo=True)  # remove echo=True in prod
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -21,4 +21,6 @@ def get_db():
 
 # function to create a test database engine
 def create_test_engine():
-    return create_engine(f"sqlite:///{config_data['db_path_test']}", echo=False)
+    return create_engine(
+        f"sqlite:///{config_data['database']['path_test']}", echo=False
+    )
