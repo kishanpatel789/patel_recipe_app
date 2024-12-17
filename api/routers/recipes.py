@@ -83,7 +83,9 @@ def read_recipe_by_slug(
 
 @router.post("/", response_model=schemas.RecipeDetailSchema, status_code=201)
 def create_recipe(
-    recipe_schema_input: schemas.RecipeCreate, db: Session = Depends(get_db)
+    recipe_schema_input: schemas.RecipeCreate,
+    db: Session = Depends(get_db),
+    current_user: schemas.UserDetailSchema = Depends(get_current_active_user),
 ):
 
     # check for existing recipe
@@ -113,7 +115,7 @@ def create_recipe(
             recipe_orm = models.Recipe(
                 name=recipe_schema_input.name,
                 slug=recipe_schema_input.slug,
-                created_by=1,  # TODO: remove hard-code with logged in user
+                created_by=current_user.id,
             )
             db.add(recipe_orm)
             db.flush()
@@ -153,7 +155,10 @@ def create_recipe(
 
 @router.put("/{id}", response_model=schemas.RecipeDetailSchema)
 def update_recipe(
-    id: int, recipe_schema_input: schemas.RecipeEdit, db: Session = Depends(get_db)
+    id: int,
+    recipe_schema_input: schemas.RecipeEdit,
+    db: Session = Depends(get_db),
+    current_user: schemas.UserDetailSchema = Depends(get_current_active_user),
 ):
 
     # check for existing recipe
@@ -212,7 +217,7 @@ def update_recipe(
             existing_recipe.name = recipe_schema_input.name
             existing_recipe.slug = recipe_schema_input.slug
             existing_recipe.date_modified = datetime.now(UTC)
-            existing_recipe.modified_by = 2
+            existing_recipe.modified_by = current_user.id
             existing_recipe.is_active = recipe_schema_input.is_active
 
             # update direction model - create, update, delete

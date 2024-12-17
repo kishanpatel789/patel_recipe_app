@@ -39,12 +39,12 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_user(username: str, db: Session) -> schemas.UserSchema | None:
+def get_user(username: str, db: Session) -> schemas.UserDetailSchema | None:
     query = select(models.User).where(models.User.user_name == username)
 
     user_orm = db.execute(query).unique().scalar_one_or_none()
     if user_orm is not None:
-        return schemas.UserSchema(
+        return schemas.UserDetailSchema(
             id=user_orm.id,
             user_name=user_orm.user_name,
             hashed_password=user_orm.password,
@@ -107,7 +107,7 @@ async def login_for_access_token(
 async def verify_token(
     token: Annotated[str, Depends(oauth2_scheme)],
     db: Session = Depends(get_db),
-):
+) -> schemas.UserDetailSchema:
 
     try:
         payload = jwt.decode(
@@ -151,15 +151,15 @@ async def verify_token(
 
 
 async def get_current_active_user(
-    current_user: Annotated[schemas.UserSchema, Depends(verify_token)],
-):
+    current_user: Annotated[schemas.UserDetailSchema, Depends(verify_token)],
+) -> schemas.UserDetailSchema:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-@router.get("/users/me")
+@router.get("/users/me", response_model=schemas.UserSchema)
 async def read_users_me(
-    current_user: Annotated[schemas.UserSchema, Depends(get_current_active_user)],
+    current_user: Annotated[schemas.UserDetailSchema, Depends(get_current_active_user)],
 ):
     return current_user

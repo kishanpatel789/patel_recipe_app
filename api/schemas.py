@@ -115,5 +115,8 @@ class UserBase(MyBaseModel):
 
 class UserSchema(UserBase):
     id: int
-    hashed_password: str
     is_active: bool
+
+
+class UserDetailSchema(UserSchema):
+    hashed_password: str
