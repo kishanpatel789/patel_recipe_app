@@ -1,14 +1,12 @@
 from typing import Annotated
+from datetime import datetime, timezone, timedelta
 
-from fastapi import Depends, FastAPI, HTTPException, status, APIRouter
+from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from datetime import datetime, timezone, timedelta
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
-
 import jwt
 from jwt.exceptions import InvalidTokenError
 
@@ -36,18 +34,9 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
-    username: str | None = None
-    role: str | None = None
-
-
 # helper functions to handle authentication
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
 
 
 def get_user(username: str, db: Session) -> schemas.UserSchema | None:
@@ -64,13 +53,22 @@ def get_user(username: str, db: Session) -> schemas.UserSchema | None:
         )
 
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user(username: str, password: str, db: Session):
     user = get_user(username, db)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
         return False
     return user
+
+
+def return_credentials_exception(detail="Could not validate credentials"):
+    cred_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    return cred_exception
 
 
 # token generator
@@ -84,7 +82,6 @@ def create_access_token(sub: str, role: str):
         "aud": ACCESS_TOKEN_AUD,
         "role": role,
     }
-
     encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=SIGNING_ALGORITHM)
 
     return encoded_jwt
@@ -96,13 +93,9 @@ async def login_for_access_token(
     db: Session = Depends(get_db),
 ):
     # authenticate user
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise return_credentials_exception("Incorrect username or password")
 
     # generate token
     access_token = create_access_token(user.user_name, user.role)
@@ -110,33 +103,55 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-async def get_current_user(
-    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
-) -> schemas.UserSchema:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+# token validator
+async def verify_token(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
+
     try:
         payload = jwt.decode(
-            token, SECRET_KEY, algorithms=[SIGNING_ALGORITHM], audience=ACCESS_TOKEN_AUD
+            token,
+            SECRET_KEY,
+            algorithms=[SIGNING_ALGORITHM],
+            audience=ACCESS_TOKEN_AUD,
         )
         username: str = payload.get("sub")
-        role: str = payload.get("role")
         if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username, role=role)
-    except InvalidTokenError:
-        raise credentials_exception
+            raise return_credentials_exception("Token has no 'sub' value")
+
+    except jwt.exceptions.InvalidSignatureError as e:
+        raise return_credentials_exception(
+            f"Authorization token (JWT) signature is invalid: {e}"
+        )
+    except jwt.exceptions.ExpiredSignatureError as e:
+        raise return_credentials_exception(f"Authorization token (JWT) is expired: {e}")
+    except jwt.exceptions.InvalidAudienceError as e:
+        raise return_credentials_exception(
+            f"Authorization token (JWT) specifies the wrong audience: expected '{ACCESS_TOKEN_AUD}': {e}"
+        )
+    except jwt.exceptions.ImmatureSignatureError as e:
+        raise return_credentials_exception(
+            f"Authorization token (JWT) is not yet valid: {e}"
+        )
+    except jwt.exceptions.DecodeError as e:
+        raise return_credentials_exception(
+            f"Authorization token (JWT) could not be decoded: {e}"
+        )
+    except Exception as e:
+        raise return_credentials_exception(f"Unexpected exception: {e}")
+
     user = get_user(username, db)
     if user is None:
-        raise credentials_exception
+        raise return_credentials_exception(
+            f"User '{username}' is not in approved internal list"
+        )
+
     return user
 
 
 async def get_current_active_user(
-    current_user: Annotated[schemas.UserSchema, Depends(get_current_user)],
+    current_user: Annotated[schemas.UserSchema, Depends(verify_token)],
 ):
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -148,5 +163,3 @@ async def read_users_me(
     current_user: Annotated[schemas.UserSchema, Depends(get_current_active_user)],
 ):
     return current_user
-
-

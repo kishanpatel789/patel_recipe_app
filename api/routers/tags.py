@@ -8,11 +8,13 @@ from typing import Type
 
 from .. import models, schemas
 from ..database import get_db
+from ..auth import get_current_active_user
 from .common import modify_query_for_activity
 
 router = APIRouter(
     prefix="/tags",
     tags=["tags"],
+    dependencies=[Depends(get_current_active_user)],
 )
 
 

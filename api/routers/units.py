@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session  # for typing
 
 from .. import models, schemas
 from ..database import get_db
+from ..auth import get_current_active_user
 from .common import modify_query_for_activity
 
 router = APIRouter(
     prefix="/units",
     tags=["units"],
+    dependencies=[Depends(get_current_active_user)],
 )
 
 

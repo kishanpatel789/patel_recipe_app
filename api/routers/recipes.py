@@ -9,11 +9,13 @@ from datetime import datetime, UTC
 
 from .. import models, schemas
 from ..database import get_db
+from ..auth import get_current_active_user
 from .common import modify_query_for_activity
 
 router = APIRouter(
     prefix="/recipes",
     tags=["recipes"],
+    dependencies=[Depends(get_current_active_user)],
 )
 
 
