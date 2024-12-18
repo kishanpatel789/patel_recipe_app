@@ -8,11 +8,10 @@ from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
 import jwt
-from jwt.exceptions import InvalidTokenError
 
 from .config import config_data
-from . import models, schemas
 from .database import get_db
+from . import models, schemas
 
 AUTH_CONFIG = config_data["auth"]
 SECRET_KEY = AUTH_CONFIG["secret_key"]

@@ -1,0 +1,28 @@
+@authToken = {{login.response.body.access_token}}
+
+# @name login
+POST {{baseUrl}}/token/
+accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+username=kishan
+&password={{password}}
+
+###
+GET {{baseUrl}}/tags/
+?page=1
+&size=2
+accept: application/json
+Authorization: Bearer {{authToken}}
+
+
+###
+POST {{baseUrl}}/tags/
+accept: application/json
+Authorization: Bearer {{authToken}}
+
+{
+  "name": "ExtraTag14"
+}
+
+###

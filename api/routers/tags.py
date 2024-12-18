@@ -20,10 +20,13 @@ router = APIRouter(
 
 # tag endpoints
 @router.get("/", response_model=list[schemas.TagSchema])
-def read_tags(active_only: bool = False, db: Session = Depends(get_db)):
+def read_tags(active_only: bool = False, page: int = 1, size: int = 10, db: Session = Depends(get_db)):
 
     base_query = select(models.Tag).order_by(models.Tag.name)
     finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
+
+    offset = (page - 1) * size
+    finished_query = finished_query.offset(offset).limit(size)
 
     tag_orms = db.execute(finished_query).scalars().unique().all()
 
