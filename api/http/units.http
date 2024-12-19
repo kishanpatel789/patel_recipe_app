@@ -1,0 +1,18 @@
+@authToken = {{login.response.body.access_token}}
+
+# @name login
+POST {{baseUrl}}/token/
+accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+username=kishan
+&password={{password}}
+
+###
+GET {{baseUrl}}/units/
+?q=c
+accept: application/json
+Authorization: Bearer {{authToken}}
+
+
+###

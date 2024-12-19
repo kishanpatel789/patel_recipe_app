@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends
+from typing import Annotated
 
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
 
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity
+from .common import modify_query_for_activity, modify_query_for_query_param
 
 router = APIRouter(
     prefix="/units",
@@ -17,10 +18,15 @@ router = APIRouter(
 
 # unit endpoints
 @router.get("/", response_model=list[schemas.UnitDetailSchema])
-def read_units(active_only: bool = False, db: Session = Depends(get_db)):
+def read_units(
+    q: Annotated[str | None, Query(max_length=40)] = None,
+    active_only: bool = False,
+    db: Session = Depends(get_db),
+):
 
     base_query = select(models.Unit).order_by(models.Unit.name)
-    finished_query = modify_query_for_activity(models.Unit, base_query, active_only)
+    query = modify_query_for_activity(models.Unit, base_query, active_only)
+    finished_query = modify_query_for_query_param(models.Unit, query, q)
 
     unit_orms = db.execute(finished_query).scalars().unique().all()
 

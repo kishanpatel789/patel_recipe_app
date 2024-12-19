@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import Type
+from typing import Type, Annotated
 
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity
+from .common import modify_query_for_activity, modify_query_for_query_param
 
 router = APIRouter(
     prefix="/tags",
@@ -20,10 +20,17 @@ router = APIRouter(
 
 # tag endpoints
 @router.get("/", response_model=list[schemas.TagSchema])
-def read_tags(active_only: bool = False, page: int = 1, size: int = 10, db: Session = Depends(get_db)):
+def read_tags(
+    q: Annotated[str | None, Query(max_length=40)] = None,
+    active_only: bool = False,
+    page: int = 1,
+    size: int = 10,
+    db: Session = Depends(get_db),
+):
 
     base_query = select(models.Tag).order_by(models.Tag.name)
-    finished_query = modify_query_for_activity(models.Tag, base_query, active_only)
+    query = modify_query_for_activity(models.Tag, base_query, active_only)
+    finished_query = modify_query_for_query_param(models.Tag, query, q)
 
     offset = (page - 1) * size
     finished_query = finished_query.offset(offset).limit(size)

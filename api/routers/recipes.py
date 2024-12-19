@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
+from datetime import datetime, UTC
+from typing import Type, Optional, Annotated
 
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import select, or_
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import Type, Optional
-from datetime import datetime, UTC
 
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity
+from .common import modify_query_for_activity, modify_query_for_query_param
 
 router = APIRouter(
     prefix="/recipes",
@@ -41,10 +41,15 @@ def verify_unit_id(unit_id: int | None, db: Session):
 
 # endpoints
 @router.get("/", response_model=list[schemas.RecipeSchema])
-def read_recipes(active_only: bool = False, db: Session = Depends(get_db)):
+def read_recipes(
+    q: Annotated[str | None, Query(max_length=40)] = None,
+    active_only: bool = False,
+    db: Session = Depends(get_db),
+):
 
     base_query = select(models.Recipe).order_by(models.Recipe.name)
-    finished_query = modify_query_for_activity(models.Recipe, base_query, active_only)
+    query = modify_query_for_activity(models.Recipe, base_query, active_only)
+    finished_query = modify_query_for_query_param(models.Recipe, query, q)
 
     recipe_orms = db.execute(finished_query).scalars().unique().all()
 
