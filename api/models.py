@@ -25,6 +25,10 @@ class Base(DeclarativeBase):
     metadata = metadata_obj
 
 
+class IsActiveMixin:
+    is_active = mapped_column(Boolean, default=True, nullable=False)
+
+
 recipe_tag = Table(
     "recipe_tag",
     Base.metadata,
@@ -40,7 +44,7 @@ complementary_dish = Table(
 )
 
 
-class Recipe(Base):
+class Recipe(Base, IsActiveMixin):
     __tablename__ = "recipe"
     id = mapped_column(Integer, primary_key=True)
     name = mapped_column(String, unique=True, nullable=False)
@@ -53,7 +57,7 @@ class Recipe(Base):
         nullable=False,
     )
     modified_by = mapped_column(Integer, ForeignKey("user.id"))
-    is_active = mapped_column(Boolean, default=True, nullable=False)
+    # is_active = mapped_column(Boolean, default=True, nullable=False)
 
     directions = relationship(
         "Direction",
@@ -76,36 +80,36 @@ class Recipe(Base):
         return f"<Recipe {self.name}>"
 
 
-class Tag(Base):
+class Tag(Base, IsActiveMixin):
     __tablename__ = "tag"
     id = mapped_column(Integer, primary_key=True)
     name = mapped_column(String, unique=True, nullable=False)
-    is_active = mapped_column(Boolean, default=True, nullable=False)
+    # is_active = mapped_column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return f"<Tag {self.id} {self.name}>"
 
 
-class Unit(Base):
+class Unit(Base, IsActiveMixin):
     __tablename__ = "unit"
     id = mapped_column(Integer, primary_key=True)
     name = mapped_column(String, unique=True, nullable=False)
     name_plural = mapped_column(String, unique=True, nullable=False)
     abbr_singular = mapped_column(String)
     abbr_plural = mapped_column(String)
-    is_active = mapped_column(Boolean, default=True, nullable=False)
+    # is_active = mapped_column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return f"<Unit {self.id} {self.name}>"
 
 
-class User(Base):
+class User(Base, IsActiveMixin):
     __tablename__ = "user"
     id = mapped_column(Integer, primary_key=True)
     user_name = mapped_column(String, unique=True, nullable=False)
     password = mapped_column(String, nullable=False)
     role = mapped_column(String, nullable=False)
-    is_active = mapped_column(Boolean, default=True, nullable=False)
+    # is_active = mapped_column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return f"<User {self.user_name}>"

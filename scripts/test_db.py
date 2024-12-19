@@ -169,3 +169,6 @@ print(str(
                                     models.Recipe.slug=='hello-world'))
 ))
 # %%
+print(str(
+    select(models.Tag).where(models.Tag.name.ilike('hello'))
+))

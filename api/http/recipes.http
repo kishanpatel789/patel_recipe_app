@@ -1,7 +1,18 @@
-GET http://localhost:8000/recipes/
+@authToken = {{login.response.body.access_token}}
+
+# @name login
+POST {{baseUrl}}/token/
 accept: application/json
+Content-Type: application/x-www-form-urlencoded
+
+username=kishan
+&password={{password}}
 
 ###
-
-GET http://localhost:8000/recipes/id/1
+GET {{baseUrl}}/recipes/
+?q=bread
 accept: application/json
+Authorization: Bearer {{authToken}}
+
+
+###
