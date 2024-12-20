@@ -39,6 +39,38 @@ def read_tags(
 
     return tag_orms
 
+@router.get("/page", response_model=schemas.TagPage)
+def read_tag_page(
+    q: Annotated[str | None, Query(max_length=40)] = None,
+    active_only: bool = False,
+    page: int = 1,
+    size: int = 10,
+    db: Session = Depends(get_db),
+):
+
+    base_query = select(models.Tag).order_by(models.Tag.name)
+    query = modify_query_for_activity(models.Tag, base_query, active_only)
+    finished_query = modify_query_for_query_param(models.Tag, query, q)
+
+    # get total count for given activity and query params
+    # calculate total page count
+
+    offset = (page - 1) * size
+    finished_query = finished_query.offset(offset).limit(size)
+
+    tag_orms = list(db.execute(finished_query).scalars().unique().all())
+
+    page_output = schemas.TagPage(
+        data=tag_orms,
+        links=schemas.PageLinks(
+            current=f"/tags/page?q={q}&page={page}&size={size}",
+            prev=f"/tags/page?q={q}&page={page-1}&size={size}" if page > 1 else None,
+            next=f"/tags/page?q={q}&page={page+1}&size={size}",
+        )
+    )
+
+    return page_output
+
 
 @router.get("/{id}", response_model=schemas.TagSchema)
 def read_tag(id: int, active_only: bool = False, db: Session = Depends(get_db)):

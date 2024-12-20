@@ -11,6 +11,16 @@ class MyBaseModel(BaseModel):
     )
 
 
+class PageLinks(MyBaseModel):
+    current: str
+    prev: str | None = None
+    next: str | None = None
+
+
+class PageBase(MyBaseModel):
+    links: PageLinks
+
+
 class TagBase(MyBaseModel):
     name: str
 
@@ -25,6 +35,10 @@ class TagEdit(TagBase):
 
 class TagSchema(TagEdit):
     id: int
+
+
+class TagPage(PageBase):
+    data: List[TagSchema]
 
 
 class UnitBase(MyBaseModel):
@@ -48,6 +62,10 @@ class UnitSchema(UnitBase):
 
 class UnitDetailSchema(UnitEdit):
     id: int
+
+
+class UnitPage(PageBase):
+    data: List[UnitSchema]
 
 
 class IngredientBase(MyBaseModel):
@@ -106,6 +124,10 @@ class RecipeSchema(RecipeBase):
 
 class RecipeDetailSchema(RecipeSchema):
     directions: List[DirectionSchema]
+
+
+class RecipePage(PageBase):
+    data: List[RecipeSchema]
 
 
 class UserBase(MyBaseModel):
