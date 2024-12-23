@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, HttpUrl, constr, PositiveFloat
+from pydantic import BaseModel, Field, ConfigDict, HttpUrl, constr, PositiveFloat
 from typing import Optional, List
 from datetime import datetime
 
@@ -9,6 +9,10 @@ class MyBaseModel(BaseModel):
         str_strip_whitespace=True,
         str_min_length=1,
     )
+
+class PaginationInput(MyBaseModel):
+    page: int = Field(default=1, ge=1) 
+    size: int = Field(default=10, ge=1, le=50)
 
 
 class PageLinks(MyBaseModel):

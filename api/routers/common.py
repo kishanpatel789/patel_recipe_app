@@ -1,9 +1,11 @@
-from typing import Type, Protocol
+from typing import Type, Protocol, Annotated
 
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.orm import MappedColumn
+from fastapi import Depends
 
 from ..models import IsActiveMixin
+from ..schemas import PaginationInput
 
 
 class ModelWithName(Protocol):
@@ -39,3 +41,5 @@ def modify_query_for_query_param(
             )
     else:
         return query
+
+PaginationDep = Annotated[PaginationInput, Depends()]

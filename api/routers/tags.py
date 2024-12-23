@@ -10,12 +10,16 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity, modify_query_for_query_param
+from .common import (
+    modify_query_for_activity,
+    modify_query_for_query_param,
+    PaginationDep,
+)
 
 router = APIRouter(
     prefix="/tags",
     tags=["tags"],
-    dependencies=[Depends(get_current_active_user)],
+    # dependencies=[Depends(get_current_active_user)],
 )
 
 
@@ -74,10 +78,9 @@ def generate_links(
 
 @router.get("/page", response_model=schemas.TagPage)
 def read_tag_page(
+    pagination_input: PaginationDep,
     q: Annotated[str | None, Query(max_length=40)] = None,
     active_only: bool = False,
-    page: int = 1,
-    size: int = 10,
     db: Session = Depends(get_db),
 ):
 
@@ -92,19 +95,19 @@ def read_tag_page(
 
     # calculate total page count
     total_page_count = (
-        total_row_count // size + 1
-        if total_row_count % size > 0
-        else total_row_count // size
+        total_row_count // pagination_input.size + 1
+        if total_row_count % pagination_input.size > 0
+        else total_row_count // pagination_input.size
     )
 
-    # overwrite page if out of bounds
-    if page < 1:
-        page = 1
-    elif page > total_page_count:
-        page = total_page_count
+    # give last page if requested page is out of bounds
+    page = min(
+        pagination_input.page,
+        max(total_page_count, 1),  # give at least page 1 if no records
+    )
 
-    offset = (page - 1) * size
-    finished_query = finished_query.offset(offset).limit(size)
+    offset = (page - 1) * pagination_input.size
+    finished_query = finished_query.offset(offset).limit(pagination_input.size)
 
     tag_orms = list(db.execute(finished_query).scalars().unique().all())
 
@@ -115,7 +118,9 @@ def read_tag_page(
                 current_page=page,
                 total_page_count=total_page_count,
                 path="/tags/page",
-                query_map=dict(q=q, active_only=active_only, page=page, size=size),
+                query_map=dict(
+                    q=q, active_only=active_only, page=page, size=pagination_input.size
+                ),
             )
         ),
     )
