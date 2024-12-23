@@ -14,6 +14,7 @@ from .common import (
     modify_query_for_activity,
     modify_query_for_query_param,
     PaginationDep,
+    paginate,
 )
 
 router = APIRouter(
@@ -45,37 +46,6 @@ def read_tags(
     return tag_orms
 
 
-def generate_url_query(query_map: dict):
-    return urlencode({k: v for k, v in query_map.items() if v is not None})
-
-
-def generate_links(
-    current_page: int,
-    total_page_count: int,
-    path: str,
-    query_map: dict,
-) -> dict:
-    current = f"{path}?{generate_url_query(query_map)}"
-
-    if current_page > 1:
-        query_map.update(dict(page=current_page - 1))
-        prev = f"{path}?{generate_url_query(query_map)}"
-    else:
-        prev = None
-
-    if current_page < total_page_count:
-        query_map.update(dict(page=current_page + 1))
-        next = f"{path}?{generate_url_query(query_map)}"
-    else:
-        next = None
-
-    return dict(
-        current=current,
-        prev=prev,
-        next=next,
-    )
-
-
 @router.get("/page", response_model=schemas.TagPage)
 def read_tag_page(
     pagination_input: PaginationDep,
@@ -88,42 +58,12 @@ def read_tag_page(
     query = modify_query_for_activity(models.Tag, base_query, active_only)
     finished_query = modify_query_for_query_param(models.Tag, query, q)
 
-    # get total count for given activity and query params
-    total_row_count = db.execute(
-        select(func.count(1).label("cnt")).select_from(finished_query.subquery())
-    ).scalar_one()
-
-    # calculate total page count
-    total_page_count = (
-        total_row_count // pagination_input.size + 1
-        if total_row_count % pagination_input.size > 0
-        else total_row_count // pagination_input.size
+    query_params = dict(q=q, active_only=active_only)
+    data, links = paginate(
+        pagination_input, "/tags/page", query_params, finished_query, db
     )
 
-    # give last page if requested page is out of bounds
-    page = min(
-        pagination_input.page,
-        max(total_page_count, 1),  # give at least page 1 if no records
-    )
-
-    offset = (page - 1) * pagination_input.size
-    finished_query = finished_query.offset(offset).limit(pagination_input.size)
-
-    tag_orms = list(db.execute(finished_query).scalars().unique().all())
-
-    page_output = schemas.TagPage(
-        data=tag_orms,
-        links=schemas.PageLinks(
-            **generate_links(
-                current_page=page,
-                total_page_count=total_page_count,
-                path="/tags/page",
-                query_map=dict(
-                    q=q, active_only=active_only, page=page, size=pagination_input.size
-                ),
-            )
-        ),
-    )
+    page_output = schemas.TagPage(data=data, links=links)
 
     return page_output
 
