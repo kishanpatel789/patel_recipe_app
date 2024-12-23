@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 from typing import Type, Optional, Annotated
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy import select, or_
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
@@ -10,12 +10,18 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity, modify_query_for_query_param
+from .common import (
+    modify_query_for_activity,
+    modify_query_for_query_param,
+    PaginationDep,
+    QueryDep,
+    paginate,
+)
 
 router = APIRouter(
     prefix="/recipes",
     tags=["recipes"],
-    dependencies=[Depends(get_current_active_user)],
+    # dependencies=[Depends(get_current_active_user)],
 )
 
 
@@ -40,9 +46,11 @@ def verify_unit_id(unit_id: int | None, db: Session):
 
 
 # endpoints
-@router.get("/", response_model=list[schemas.RecipeSchema])
+@router.get("/", response_model=schemas.RecipePage)
 def read_recipes(
-    q: Annotated[str | None, Query(max_length=40)] = None,
+    pagination_input: PaginationDep,
+    request: Request,
+    q: QueryDep,
     active_only: bool = False,
     db: Session = Depends(get_db),
 ):
@@ -51,9 +59,18 @@ def read_recipes(
     query = modify_query_for_activity(models.Recipe, base_query, active_only)
     finished_query = modify_query_for_query_param(models.Recipe, query, q)
 
-    recipe_orms = db.execute(finished_query).scalars().unique().all()
+    query_params = dict(q=q, active_only=active_only)
+    data, links = paginate(
+        pagination_input=pagination_input,
+        request=request,
+        query_params=query_params,
+        query=finished_query,
+        db=db,
+    )
 
-    return recipe_orms
+    page_output = schemas.RecipePage(data=data, links=links)
+
+    return page_output
 
 
 @router.get("/id/{id}", response_model=schemas.RecipeDetailSchema)

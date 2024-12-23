@@ -1,25 +1,33 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session  # for typing
 
 from .. import models, schemas
 from ..database import get_db
 from ..auth import get_current_active_user
-from .common import modify_query_for_activity, modify_query_for_query_param
+from .common import (
+    modify_query_for_activity,
+    modify_query_for_query_param,
+    PaginationDep,
+    QueryDep,
+    paginate,
+)
 
 router = APIRouter(
     prefix="/units",
     tags=["units"],
-    dependencies=[Depends(get_current_active_user)],
+    # dependencies=[Depends(get_current_active_user)],
 )
 
 
 # unit endpoints
-@router.get("/", response_model=list[schemas.UnitDetailSchema])
+@router.get("/", response_model=schemas.UnitPage)
 def read_units(
-    q: Annotated[str | None, Query(max_length=40)] = None,
+    pagination_input: PaginationDep,
+    request: Request,
+    q: QueryDep,
     active_only: bool = False,
     db: Session = Depends(get_db),
 ):
@@ -28,9 +36,18 @@ def read_units(
     query = modify_query_for_activity(models.Unit, base_query, active_only)
     finished_query = modify_query_for_query_param(models.Unit, query, q)
 
-    unit_orms = db.execute(finished_query).scalars().unique().all()
+    query_params = dict(q=q, active_only=active_only)
+    data, links = paginate(
+        pagination_input=pagination_input,
+        request=request,
+        query_params=query_params,
+        query=finished_query,
+        db=db,
+    )
 
-    return unit_orms
+    page_output = schemas.UnitPage(data=data, links=links)
+
+    return page_output
 
 
 @router.get("/{id}", response_model=schemas.UnitDetailSchema)

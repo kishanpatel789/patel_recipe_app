@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field, ConfigDict, HttpUrl, constr, PositiveFloat
-from typing import Optional, List
 from datetime import datetime
 
 
@@ -10,8 +9,9 @@ class MyBaseModel(BaseModel):
         str_min_length=1,
     )
 
+
 class PaginationInput(MyBaseModel):
-    page: int = Field(default=1, ge=1) 
+    page: int = Field(default=1, ge=1)
     size: int = Field(default=10, ge=1, le=50)
 
 
@@ -22,6 +22,7 @@ class PageLinks(MyBaseModel):
 
 
 class PageBase(MyBaseModel):
+    data: list
     links: PageLinks
 
 
@@ -42,7 +43,7 @@ class TagSchema(TagEdit):
 
 
 class TagPage(PageBase):
-    data: List[TagSchema]
+    data: list[TagSchema]
 
 
 class UnitBase(MyBaseModel):
@@ -69,7 +70,7 @@ class UnitDetailSchema(UnitEdit):
 
 
 class UnitPage(PageBase):
-    data: List[UnitSchema]
+    data: list[UnitSchema]
 
 
 class IngredientBase(MyBaseModel):
@@ -91,17 +92,17 @@ class IngredientSchema(IngredientBase):
 
 class DirectionBase(MyBaseModel):
     description_: str
-    ingredients: List[IngredientBase]
+    ingredients: list[IngredientBase]
 
 
 class DirectionCreate(MyBaseModel):
     description_: str
-    ingredients: List[IngredientCreate]
+    ingredients: list[IngredientCreate]
 
 
 class DirectionSchema(DirectionBase):
     id: int
-    ingredients: List[IngredientSchema]
+    ingredients: list[IngredientSchema]
 
 
 class RecipeBase(MyBaseModel):
@@ -110,7 +111,7 @@ class RecipeBase(MyBaseModel):
 
 
 class RecipeCreate(RecipeBase):
-    directions: List[DirectionCreate]
+    directions: list[DirectionCreate]
 
 
 class RecipeEdit(RecipeCreate):
@@ -127,11 +128,11 @@ class RecipeSchema(RecipeBase):
 
 
 class RecipeDetailSchema(RecipeSchema):
-    directions: List[DirectionSchema]
+    directions: list[DirectionSchema]
 
 
 class RecipePage(PageBase):
-    data: List[RecipeSchema]
+    data: list[RecipeSchema]
 
 
 class UserBase(MyBaseModel):
