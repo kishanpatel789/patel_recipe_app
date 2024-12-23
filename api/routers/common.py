@@ -4,7 +4,8 @@ from urllib.parse import urlencode
 from sqlalchemy import select, func
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.orm import MappedColumn, Session
-from fastapi import Depends
+from fastapi import Depends, Request
+from pydantic import HttpUrl
 
 from .. import models
 from .. import schemas
@@ -52,33 +53,37 @@ def generate_url_query(query_map: dict):
 def generate_links(
     current_page: int,
     total_page_count: int,
-    path: str,
+    request: Request,
     query_map: dict,
+
 ) -> schemas.PageLinks:
-    current = f"{path}?{generate_url_query(query_map)}"
+    
+    base_url = f"{request.url.scheme}://{request.url.netloc}{request.url.path}"
+
+    current = f"{base_url}?{generate_url_query(query_map)}"
 
     if current_page > 1:
         query_map.update(dict(page=current_page - 1))
-        prev = f"{path}?{generate_url_query(query_map)}"
+        prev = f"{base_url}?{generate_url_query(query_map)}"
     else:
         prev = None
 
     if current_page < total_page_count:
         query_map.update(dict(page=current_page + 1))
-        next = f"{path}?{generate_url_query(query_map)}"
+        next = f"{base_url}?{generate_url_query(query_map)}"
     else:
         next = None
 
     return schemas.PageLinks(
-        current=current,
-        prev=prev,
-        next=next,
+        current=current, # type: ignore
+        prev=prev, # type: ignore
+        next=next, # type: ignore
     )
 
 
 def paginate(
     pagination_input: schemas.PaginationInput,
-    path: str,
+    request: Request,
     query_params: dict,
     query: Select,
     db: Session,
@@ -111,7 +116,7 @@ def paginate(
     links = generate_links(
         current_page=page,
         total_page_count=total_page_count,
-        path=path,
+        request=request,
         query_map=query_params,
     )
 

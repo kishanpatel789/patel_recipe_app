@@ -26,3 +26,6 @@ Authorization: Bearer {{authToken}}
 }
 
 ###
+GET {{baseUrl}}/tags/page
+accept: application/json
+Authorization: Bearer {{authToken}}

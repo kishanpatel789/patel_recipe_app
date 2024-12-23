@@ -1,7 +1,7 @@
 from typing import Type, Annotated
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
@@ -25,30 +25,10 @@ router = APIRouter(
 
 
 # tag endpoints
-@router.get("/", response_model=list[schemas.TagSchema])
+@router.get("/", response_model=schemas.TagPage)
 def read_tags(
-    q: Annotated[str | None, Query(max_length=40)] = None,
-    active_only: bool = False,
-    page: int = 1,
-    size: int = 10,
-    db: Session = Depends(get_db),
-):
-
-    base_query = select(models.Tag).order_by(models.Tag.name)
-    query = modify_query_for_activity(models.Tag, base_query, active_only)
-    finished_query = modify_query_for_query_param(models.Tag, query, q)
-
-    offset = (page - 1) * size
-    finished_query = finished_query.offset(offset).limit(size)
-
-    tag_orms = db.execute(finished_query).scalars().unique().all()
-
-    return tag_orms
-
-
-@router.get("/page", response_model=schemas.TagPage)
-def read_tag_page(
     pagination_input: PaginationDep,
+    request: Request,
     q: Annotated[str | None, Query(max_length=40)] = None,
     active_only: bool = False,
     db: Session = Depends(get_db),
@@ -60,7 +40,11 @@ def read_tag_page(
 
     query_params = dict(q=q, active_only=active_only)
     data, links = paginate(
-        pagination_input, "/tags/page", query_params, finished_query, db
+        pagination_input=pagination_input,
+        request=request,
+        query_params=query_params,
+        query=finished_query,
+        db=db,
     )
 
     page_output = schemas.TagPage(data=data, links=links)

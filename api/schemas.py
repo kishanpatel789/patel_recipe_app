@@ -16,9 +16,9 @@ class PaginationInput(MyBaseModel):
 
 
 class PageLinks(MyBaseModel):
-    current: str
-    prev: str | None = None
-    next: str | None = None
+    current: HttpUrl
+    prev: HttpUrl | None = None
+    next: HttpUrl | None = None
 
 
 class PageBase(MyBaseModel):
