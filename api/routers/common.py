@@ -1,10 +1,11 @@
 from typing import Type, Protocol, Annotated
 from urllib.parse import urlencode
+import re
 
 from sqlalchemy import select, func
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.orm import MappedColumn, Session
-from fastapi import Depends, Request
+from fastapi import Depends, Request, Query
 from pydantic import HttpUrl
 
 from .. import models
@@ -16,6 +17,15 @@ class ModelWithName(Protocol):
 
 
 # helper functions
+def get_query_param(
+    q: Annotated[str | None, Query(max_length=40)] = None
+) -> str | None:
+    if q is not None:
+        q = q.strip()
+        q = re.sub(r"\s+", " ", q)
+    return q
+
+
 def modify_query_for_activity(
     model: Type[models.IsActiveMixin], query: Select, active_only: bool
 ) -> Select:
@@ -46,7 +56,7 @@ def modify_query_for_query_param(
         return query
 
 
-def generate_url_query(query_map: dict):
+def generate_url_query(query_map: dict) -> str:
     return urlencode({k: v for k, v in query_map.items() if v is not None})
 
 
@@ -55,9 +65,8 @@ def generate_links(
     total_page_count: int,
     request: Request,
     query_map: dict,
-
 ) -> schemas.PageLinks:
-    
+
     base_url = f"{request.url.scheme}://{request.url.netloc}{request.url.path}"
 
     current = f"{base_url}?{generate_url_query(query_map)}"
@@ -75,9 +84,9 @@ def generate_links(
         next = None
 
     return schemas.PageLinks(
-        current=current, # type: ignore
-        prev=prev, # type: ignore
-        next=next, # type: ignore
+        current=current,  # type: ignore
+        prev=prev,  # type: ignore
+        next=next,  # type: ignore
     )
 
 
@@ -88,7 +97,7 @@ def paginate(
     query: Select,
     db: Session,
 ) -> tuple[list, schemas.PageLinks]:
-    
+
     # get total count for given activity and query params
     total_row_count = db.execute(
         select(func.count(1).label("cnt")).select_from(query.subquery())
@@ -110,7 +119,7 @@ def paginate(
 
     offset = (page - 1) * pagination_input.size
     finished_query = query.offset(offset).limit(pagination_input.size)
-    
+
     data = list(db.execute(finished_query).scalars().unique().all())
 
     links = generate_links(
@@ -124,3 +133,5 @@ def paginate(
 
 
 PaginationDep = Annotated[schemas.PaginationInput, Depends()]
+
+QueryDep = Annotated[str | None, Depends(get_query_param)] 

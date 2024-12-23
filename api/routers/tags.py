@@ -14,6 +14,7 @@ from .common import (
     modify_query_for_activity,
     modify_query_for_query_param,
     PaginationDep,
+    QueryDep,
     paginate,
 )
 
@@ -29,7 +30,7 @@ router = APIRouter(
 def read_tags(
     pagination_input: PaginationDep,
     request: Request,
-    q: Annotated[str | None, Query(max_length=40)] = None,
+    q: QueryDep,
     active_only: bool = False,
     db: Session = Depends(get_db),
 ):
