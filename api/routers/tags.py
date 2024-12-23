@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from typing import Type, Annotated
+from urllib.parse import urlencode
 
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from typing import Type, Annotated
 
 from .. import models, schemas
 from ..database import get_db
@@ -40,6 +41,37 @@ def read_tags(
     return tag_orms
 
 
+def generate_url_query(query_map: dict):
+    return urlencode({k: v for k, v in query_map.items() if v is not None})
+
+
+def generate_links(
+    current_page: int,
+    total_page_count: int,
+    path: str,
+    query_map: dict,
+) -> dict:
+    current = f"{path}?{generate_url_query(query_map)}"
+
+    if current_page > 1:
+        query_map.update(dict(page=current_page - 1))
+        prev = f"{path}?{generate_url_query(query_map)}"
+    else:
+        prev = None
+
+    if current_page < total_page_count:
+        query_map.update(dict(page=current_page + 1))
+        next = f"{path}?{generate_url_query(query_map)}"
+    else:
+        next = None
+
+    return dict(
+        current=current,
+        prev=prev,
+        next=next,
+    )
+
+
 @router.get("/page", response_model=schemas.TagPage)
 def read_tag_page(
     q: Annotated[str | None, Query(max_length=40)] = None,
@@ -66,7 +98,7 @@ def read_tag_page(
     )
 
     # overwrite page if out of bounds
-    if page < 1: 
+    if page < 1:
         page = 1
     elif page > total_page_count:
         page = total_page_count
@@ -79,17 +111,12 @@ def read_tag_page(
     page_output = schemas.TagPage(
         data=tag_orms,
         links=schemas.PageLinks(
-            current=f"/tags/page?q={q}&active_only={active_only}&page={page}&size={size}",
-            prev=(
-                f"/tags/page?q={q}&active_only={active_only}&page={page-1}&size={size}"
-                if page > 1
-                else None
-            ),
-            next=(
-                f"/tags/page?q={q}&active_only={active_only}&page={page+1}&size={size}"
-                if page < total_page_count
-                else None
-            ),
+            **generate_links(
+                current_page=page,
+                total_page_count=total_page_count,
+                path="/tags/page",
+                query_map=dict(q=q, active_only=active_only, page=page, size=size),
+            )
         ),
     )
 
