@@ -14,7 +14,7 @@ class ModelWithName(Protocol):
 def modify_query_for_activity(
     model: Type[IsActiveMixin], query: Select, active_only: bool
 ):
-    if active_only:
+    if active_only is not None:
         if hasattr(model, "is_active"):
             return query.where(model.is_active == True)
         else:
@@ -28,7 +28,7 @@ def modify_query_for_activity(
 def modify_query_for_query_param(
     model: Type[ModelWithName], query: Select, query_param: str | None
 ):
-    if query_param:
+    if query_param is not None:
         if hasattr(model, "name"):
             return query.where(
                 model.name.ilike(f"%{query_param.strip().replace(' ', '%')}%")

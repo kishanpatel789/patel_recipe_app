@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session  # for typing
 from sqlalchemy.sql.selectable import Select  # for typing
 from sqlalchemy.ext.declarative import DeclarativeMeta
@@ -39,6 +39,7 @@ def read_tags(
 
     return tag_orms
 
+
 @router.get("/page", response_model=schemas.TagPage)
 def read_tag_page(
     q: Annotated[str | None, Query(max_length=40)] = None,
@@ -53,7 +54,22 @@ def read_tag_page(
     finished_query = modify_query_for_query_param(models.Tag, query, q)
 
     # get total count for given activity and query params
+    total_row_count = db.execute(
+        select(func.count(1).label("cnt")).select_from(finished_query.subquery())
+    ).scalar_one()
+
     # calculate total page count
+    total_page_count = (
+        total_row_count // size + 1
+        if total_row_count % size > 0
+        else total_row_count // size
+    )
+
+    # overwrite page if out of bounds
+    if page < 1: 
+        page = 1
+    elif page > total_page_count:
+        page = total_page_count
 
     offset = (page - 1) * size
     finished_query = finished_query.offset(offset).limit(size)
@@ -63,10 +79,18 @@ def read_tag_page(
     page_output = schemas.TagPage(
         data=tag_orms,
         links=schemas.PageLinks(
-            current=f"/tags/page?q={q}&page={page}&size={size}",
-            prev=f"/tags/page?q={q}&page={page-1}&size={size}" if page > 1 else None,
-            next=f"/tags/page?q={q}&page={page+1}&size={size}",
-        )
+            current=f"/tags/page?q={q}&active_only={active_only}&page={page}&size={size}",
+            prev=(
+                f"/tags/page?q={q}&active_only={active_only}&page={page-1}&size={size}"
+                if page > 1
+                else None
+            ),
+            next=(
+                f"/tags/page?q={q}&active_only={active_only}&page={page+1}&size={size}"
+                if page < total_page_count
+                else None
+            ),
+        ),
     )
 
     return page_output

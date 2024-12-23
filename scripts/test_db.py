@@ -6,7 +6,7 @@ sys.path.insert(1, '..')
 import api.models as models
 import api.schemas as schemas
 from api.database import SessionLocal
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, func
 
 
 # %%
@@ -171,4 +171,15 @@ print(str(
 # %%
 print(str(
     select(models.Tag).where(models.Tag.name.ilike('hello'))
+))
+
+# %%
+print(str(
+    select(func.count(1)).where(models.Tag.is_active == True).where(
+                models.Tag.name.ilike(f"%tag%")
+            )
+))
+# %%
+print(str(
+    select(func.count(1).label('cnt')).select_from(select(models.Tag).order_by(models.Tag.name).subquery())
 ))
