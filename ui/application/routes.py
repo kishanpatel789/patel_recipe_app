@@ -1,5 +1,12 @@
-from flask import render_template, make_response, abort, \
-    redirect, url_for, flash, request
+from flask import (
+    render_template,
+    make_response,
+    abort,
+    redirect,
+    url_for,
+    flash,
+    request,
+)
 from flask import current_app as app
 import json
 from fractions import Fraction
@@ -7,6 +14,7 @@ import requests
 
 # from .models import db, Recipe, Ingredient, Direction, Tag, Unit
 from .forms import TagForm, UnitForm, RecipeForm, IngredientForm
+
 
 # register custom jinja filters
 def format_number(value):
@@ -16,13 +24,16 @@ def format_number(value):
         else:
             frac = Fraction(value).limit_denominator(10)
             whole = frac.numerator // frac.denominator
-            remainder = frac.numerator % frac.denominator 
+            remainder = frac.numerator % frac.denominator
             if whole != 0:
                 return f"{whole} {Fraction(remainder, frac.denominator)}"
             else:
                 return f"{Fraction(remainder, frac.denominator)}"
     return value
-app.jinja_env.filters['format_number'] = format_number
+
+
+app.jinja_env.filters["format_number"] = format_number
+
 
 # helper functions
 def get_midpoint(lst):
@@ -33,29 +44,44 @@ def get_midpoint(lst):
             midpoint = len(lst) // 2 + 1
         return midpoint
 
+
 # call api
-def call_api(endpoint, method='GET', payload=None):
-  url = "/".join([app.config["APP_DATA"]["backend_server"], endpoint])
+def convert_links_backend_to_frontend(links: dict):
+    for key, value in links.items():
+        if value is not None:
+            links[key] = value.replace(app.config["APP_DATA"]["backend_server"], "")
+    return links
 
-  # clear unwanted keys from payload
-  if payload:
-    payload = {key: value for key, value in payload.items() if key not in ["csrf_token", "submit"]}
 
-  if method=="GET":
-    r = requests.get(url)
-  elif method=="POST":
-    r = requests.post(url, json=payload)
-  elif method=="PUT":
-    r = requests.put(url, json=payload)
+def call_api(endpoint, method="GET", payload=None):
+    url = "/".join([app.config["APP_DATA"]["backend_server"], endpoint])
 
-  r_dict = r.json()
-  r_status = r.status_code
-  if r_status >= 400:
-    flash(f"Error {r_status}: {r_dict['detail']}")
-    print(f"Error {r_status}: {r_dict['detail']}")
-#   r.raise_for_status()
+    # clear unwanted keys from payload
+    if payload:
+        payload = {
+            key: value
+            for key, value in payload.items()
+            if key not in ["csrf_token", "submit"]
+        }
 
-  return r_status, r_dict
+    if method == "GET":
+        r = requests.get(url, params=payload)
+    elif method == "POST":
+        r = requests.post(url, json=payload)
+    elif method == "PUT":
+        r = requests.put(url, json=payload)
+
+    r_dict = r.json()
+    r_status = r.status_code
+    if r_status >= 400:
+        flash(f"Error {r_status}: {r_dict['detail']}")
+        print(f"Error {r_status}: {r_dict['detail']}")
+    #   r.raise_for_status()
+
+    if "links" in r_dict:
+        r_dict["links"] = convert_links_backend_to_frontend(r_dict["links"])
+
+    return r_status, r_dict
 
 
 @app.route("/")
@@ -69,12 +95,13 @@ def home():
     # # else:
     # #     midpoint = len(recipes) // 2 + 1
     # midpoint = get_midpoint(recipes)
-    
+
     return render_template(
-        "index.html", 
-        # recipes=recipes, 
+        "index.html",
+        # recipes=recipes,
         # midpoint=midpoint
-        )
+    )
+
 
 # # recipe
 # @app.route('/recipe/<int:recipe_id>', methods=['GET'])
@@ -86,7 +113,7 @@ def home():
 
 #     # get ingredients
 #     ingredients_subquery = (db.select(
-#         Ingredient.item, 
+#         Ingredient.item,
 #         Ingredient.unit_id,
 #         db.func.sum(Ingredient.quantity).label('quantity'),
 #         db.func.min(Ingredient.direction_id * 100 + Ingredient.order_id).label('comb_order_id'),
@@ -123,8 +150,8 @@ def home():
 
 #     if recipe:
 #         return render_template(
-#             'recipe.html', 
-#             recipe=recipe, 
+#             'recipe.html',
+#             recipe=recipe,
 #             ingredients=ingredients,
 #             midpoint=midpoint,
 #         )
@@ -151,7 +178,7 @@ def home():
 #                 i.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
 
 #     form_ingredient_template.unit_id.choices = [(-1, '')] + [(u.id, u.name) for u in units]
-    
+
 #     if form.validate_on_submit():
 #         # check for existing recipe with name
 #         existing_recipe = db.session.execute(
@@ -164,9 +191,9 @@ def home():
 #                     'create_recipe.html',
 #                     form=form,
 #                     form_ingredient_template=form_ingredient_template,
-#                 )   
+#                 )
 #         else:
-#             try: 
+#             try:
 #                 db.session.close()  # close session to handle transactional-level management
 #                 with db.session.begin():
 #                     # update recipe model
@@ -199,10 +226,10 @@ def home():
 #                             db.session.add(ingredient_orm)
 
 #                 return redirect(url_for('home'))
-            
+
 #             except Exception as e:
 #                 flash(f"An error occurred: {e}")
-                
+
 #     if request.method == 'POST' and form.errors:
 #         for field, errors in form.errors.items():
 #                 for error in errors:
@@ -224,7 +251,7 @@ def home():
 #     existing_recipe = db.session.execute(
 #         db.select(Recipe).where(Recipe.id==recipe_id)
 #     ).scalars().one_or_none()
-    
+
 
 #     # populate form with submitted form info or with existing info
 #     form = RecipeForm(obj=existing_recipe)
@@ -242,9 +269,9 @@ def home():
 #         flash(f"Recipe with ID '{recipe_id}' does not exist and cannot be edited", "error")
 #         return redirect(url_for('home'))
 #     else:
-#         # persist form content 
+#         # persist form content
 #         if form.validate_on_submit():
-#             try: 
+#             try:
 #                 db.session.close()  # close session to handle transactional-level management
 #                 with db.session.begin():
 
@@ -285,7 +312,7 @@ def home():
 #                                 else:
 #                                     # create ingredient for existing direction
 #                                     new_ingredient = Ingredient(
-#                                         direction_id = existing_direction.id,                 
+#                                         direction_id = existing_direction.id,
 #                                         order_id = form_ingredient_index + 1,
 #                                         quantity = form_ingredient.quantity.data,
 #                                         unit_id = form_ingredient.unit_id.data,
@@ -301,7 +328,7 @@ def home():
 #                         else:
 #                             # create direction
 #                             new_direction = Direction(
-#                                 recipe_id = recipe_id,                 
+#                                 recipe_id = recipe_id,
 #                                 order_id = form_direction_index + 1,
 #                                 description_ = form_direction.description_.data,
 #                             )
@@ -312,7 +339,7 @@ def home():
 #                             new_ingredients = []
 #                             for form_ingredient_index, form_ingredient in enumerate(form_direction.ingredients):
 #                                 new_ingredient = Ingredient(
-#                                     direction_id = new_direction.id,                 
+#                                     direction_id = new_direction.id,
 #                                     order_id = form_ingredient_index + 1,
 #                                     quantity = form_ingredient.quantity.data,
 #                                     unit_id = form_ingredient.unit_id.data,
@@ -330,7 +357,7 @@ def home():
 
 #             except Exception as e:
 #                 flash(f"An error occurred: {e}")
-        
+
 #         # # TEST POST INPUT
 #         # if request.method == 'POST':
 #         #     return form.data
@@ -340,7 +367,6 @@ def home():
 #                 for error in errors:
 #                     flash(f"{field}: {error}", "error")
 
-        
 
 #         # set template form
 #         form_ingredient_template = IngredientForm()
@@ -352,24 +378,27 @@ def home():
 #             form_ingredient_template=form_ingredient_template,
 #             header='Edit Recipe',
 #         )
-    
+
 
 # tag
-@app.get('/tag')
+@app.get("/tags/")
 def show_tags():
     # query database
-    r_status, tags = call_api('tags')
+    r_status, response = call_api("tags", "GET", request.args)
 
     # # prepare/process form
     # form = TagForm()
+    tags = response["data"]
+    links = response["links"]
 
     return render_template(
-        'tag.html', 
-        tags=tags, 
-        # form=form,
+        "tag.html",
+        tags=tags,
+        links=links,
     )
 
-@app.get('/tag/<int:tag_id>')
+
+@app.get("/tag/<int:tag_id>")
 def get_tag_row(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -378,13 +407,13 @@ def get_tag_row(tag_id):
     # form = TagForm()
 
     return render_template(
-        'tag_row.html', 
-        tag=existing_tag, 
+        "tag_row.html",
+        tag=existing_tag,
         # form=form,
     )
 
 
-@app.get('/tag/<int:tag_id>/edit')
+@app.get("/tag/<int:tag_id>/edit")
 def get_tag_row_edit(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -392,12 +421,13 @@ def get_tag_row_edit(tag_id):
     form = TagForm(data=existing_tag)
 
     return render_template(
-       'tag_row_edit.html',
-       form=form,
-       tag_id=tag_id,
-       )
+        "tag_row_edit.html",
+        form=form,
+        tag_id=tag_id,
+    )
 
-@app.put('/tag/<int:tag_id>')
+
+@app.put("/tag/<int:tag_id>")
 def put_tag_row(tag_id):
     # look up tag_id
     # r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -411,65 +441,62 @@ def put_tag_row(tag_id):
 
         # update data in db
         r_status, updated_tag = call_api(
-            f"tags/{tag_id}", 
-            method='PUT',
-            payload=form.data
+            f"tags/{tag_id}", method="PUT", payload=form.data
         )
     else:
-       print(form.errors)
-       print(form.data)
-       return render_template(
-            'tag_row_edit.html',
+        print(form.errors)
+        print(form.data)
+        return render_template(
+            "tag_row_edit.html",
             form=form,
             tag_id=tag_id,
         )
 
-    print('updated_tag HERE:', updated_tag)
-    
+    print("updated_tag HERE:", updated_tag)
+
     return render_template(
-        'tag_row.html', 
-        tag=updated_tag, 
+        "tag_row.html",
+        tag=updated_tag,
     )
 
-@app.get('/tag/new')
+
+@app.get("/tag/new")
 def get_tag_row_new():
 
     form = TagForm()
 
     return render_template(
-       'tag_row_new.html',
-       form=form,
+        "tag_row_new.html",
+        form=form,
     )
 
-@app.get('/tag/button/new')
-def get_new_tag_button():
-   return render_template('tag_button_new.html')
 
-@app.post('/tag/new')
+@app.get("/tag/button/new")
+def get_new_tag_button():
+    return render_template("tag_button_new.html")
+
+
+@app.post("/tag/new")
 def create_tag():
     form = TagForm(is_active=True)
 
     if form.validate_on_submit():
 
         # update data in db
-        r_status, new_tag = call_api(
-            f"tags", 
-            method='POST',
-            payload=form.data
-        )
+        r_status, new_tag = call_api(f"tags", method="POST", payload=form.data)
     else:
-       print(form.errors)
-       print(form.data)
-       return render_template(
-            'tag_row_NEW.html',
+        print(form.errors)
+        print(form.data)
+        return render_template(
+            "tag_row_NEW.html",
             form=form,
         )
 
-    print('new_tag HERE:', new_tag)
-    
+    print("new_tag HERE:", new_tag)
+
     return render_template(
-        'tag_row.html', 
-        tag=new_tag, 
+        "tag_row.html",
+        tag=new_tag,
     )
 
 
@@ -484,7 +511,7 @@ def create_tag():
 #         existing_tag = db.session.execute(
 #             db.select(Tag).where(Tag.name==new_tag_name)
 #         ).scalars().one_or_none()
-        
+
 #         if existing_tag:
 #             flash(f"Tag '{new_tag_name}' already exists", "error")
 #         else:
@@ -498,7 +525,6 @@ def create_tag():
 #                 flash(f"{field}: {error}", "error")
 
 #     return redirect(url_for("show_tags"))
-        
 
 
 # @app.route('/tag/delete/<int:tag_id>', methods=['GET'])
@@ -526,8 +552,8 @@ def create_tag():
 #     form = UnitForm()
 
 #     return render_template(
-#         'unit.html', 
-#         units=units, 
+#         'unit.html',
+#         units=units,
 #         form=form,
 #         default='',
 #     )
@@ -543,7 +569,7 @@ def create_tag():
 #         existing_unit = db.session.execute(
 #             db.select(Unit).where(Unit.name==new_unit_name)
 #         ).scalars().one_or_none()
-        
+
 #         if existing_unit:
 #             flash(f"Unit '{new_unit_name}' already exists", "error")
 #         else:
@@ -569,12 +595,12 @@ def create_tag():
 #         flash(f"Unit with ID '{unit_id}' does not exist", "error")
 #     else:
 #         # populate form submitted form info or with existing info
-#         form = UnitForm(obj=existing_unit) 
+#         form = UnitForm(obj=existing_unit)
 
 #         # store form content
 #         if form.validate_on_submit():
 #             form.populate_obj(existing_unit)
-#             db.session.commit()      
+#             db.session.commit()
 #     return redirect(url_for("show_units"))
 
 # @app.route('/unit/delete/<int:unit_id>', methods=['GET'])

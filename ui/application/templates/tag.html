@@ -17,4 +17,13 @@
   {%endif%}
   </div>
 
+  <div>
+    {% if links['prev'] %}
+      <a href="{{ links['prev'] }}">Previous</a>
+    {% endif %}
+    {% if links['next'] %}
+      <a href="{{ links['next'] }}">Next</a>
+    {% endif %}
+  </div>
+
 {% endblock %}
