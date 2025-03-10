@@ -398,7 +398,7 @@ def show_tags():
     )
 
 
-@app.get("/tag/<int:tag_id>")
+@app.get("/tags/<int:tag_id>")
 def get_tag_row(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -413,7 +413,7 @@ def get_tag_row(tag_id):
     )
 
 
-@app.get("/tag/<int:tag_id>/edit")
+@app.get("/tags/<int:tag_id>/edit")
 def get_tag_row_edit(tag_id):
     # look up tag_id
     r_status, existing_tag = call_api(f"tags/{tag_id}")
@@ -427,7 +427,7 @@ def get_tag_row_edit(tag_id):
     )
 
 
-@app.put("/tag/<int:tag_id>")
+@app.put("/tags/<int:tag_id>")
 def put_tag_row(tag_id):
     # look up tag_id
     # r_status, existing_tag = call_api(f"tags/{tag_id}")
